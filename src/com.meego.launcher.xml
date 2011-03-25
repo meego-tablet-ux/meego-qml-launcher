@@ -1,0 +1,7 @@
+<node>
+  <interface name="com.meego.launcher">
+    <method name="raise">
+      <arg name="cmdline" type="as"/>
+    </method>
+  </interface>
+</node>
