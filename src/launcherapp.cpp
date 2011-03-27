@@ -237,3 +237,11 @@ bool LauncherApp::x11EventFilter(XEvent *event)
     return QApplication::x11EventFilter(event);
 }
 
+void LauncherApp::setOrientationLocked(bool locked)
+{
+    orientationLocked = locked;
+    if (locked)
+        emit stopOrientationSensor();
+    else
+        emit startOrientationSensor();
+}

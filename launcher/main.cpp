@@ -8,6 +8,7 @@
 
 #include <QPluginLoader>
 #include <QInputContext>
+#include <QObject>
 #include <QOrientationReading>
 #include <QOrientationSensor>
 #include <QOrientationFilter>
@@ -136,6 +137,9 @@ int main(int argc, char *argv[])
     OrientationSensorFilter filter;
     sensor.addFilter(&filter);
     sensor.start();
+
+    QObject::connect(&a, SIGNAL(startOrientationSensor()), &sensor, SLOT(start()));
+    QObject::connect(&a, SIGNAL(stopOrientationSensor()), &sensor, SLOT(stop()));
 
     foreach (QString path, QCoreApplication::libraryPaths())
     {

@@ -17,7 +17,8 @@ class QSettings;
 class LauncherApp : public QApplication
 {
     Q_OBJECT
-    Q_PROPERTY(int orientation READ getOrientation NOTIFY orientationChanged)
+    Q_PROPERTY(int orientation READ getOrientation NOTIFY orientationChanged);
+    Q_PROPERTY(bool orientationLocked READ getOrientationLocked WRITE setOrientationLocked);
     Q_PROPERTY(int foregroundWindow READ getForegroundWindow NOTIFY foregroundWindowChanged);
 
 public:
@@ -30,6 +31,11 @@ public:
         orientation = o;
         emit orientationChanged();
     }
+
+    bool getOrientationLocked() {
+        return orientationLocked;
+    }
+    void setOrientationLocked(bool locked);
 
     int getForegroundWindow() {
         return foregroundWindow;
@@ -47,6 +53,8 @@ signals:
     void orientationChanged();
     void foregroundWindowChanged();
     void dismissKeyboard();
+    void stopOrientationSensor();
+    void startOrientationSensor();
 
 protected:
     virtual bool x11EventFilter(XEvent *event);
@@ -55,6 +63,7 @@ private:
     void dbusInit(int argc, char** argv);
 
     int orientation;
+    bool orientationLocked;
     bool noRaise;
     int foregroundWindow;
 
