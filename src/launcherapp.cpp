@@ -139,6 +139,14 @@ void LauncherApp::raise(const QStringList& parameters)
     }
 }
 
+void LauncherApp::hide()
+{
+    foreach (QWidget *widget, QApplication::topLevelWidgets())
+    {
+        widget->hide();
+    }
+}
+
 void LauncherApp::appPageLoaded()
 {
     qint64 time = QDateTime::currentDateTime().toMSecsSinceEpoch();

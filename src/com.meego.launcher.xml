@@ -3,5 +3,6 @@
     <method name="raise">
       <arg name="cmdline" type="as"/>
     </method>
+    <method name="hide"/>
   </interface>
 </node>

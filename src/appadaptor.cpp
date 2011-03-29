@@ -33,6 +33,12 @@ MeeGoAppAdaptor::~MeeGoAppAdaptor()
     // destructor
 }
 
+void MeeGoAppAdaptor::hide()
+{
+    // handle method call com.meego.launcher.hide
+    QMetaObject::invokeMethod(parent(), "hide");
+}
+
 void MeeGoAppAdaptor::raise(const QStringList &cmdline)
 {
     // handle method call com.meego.launcher.raise

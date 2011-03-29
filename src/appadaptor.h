@@ -9,8 +9,8 @@
  * before re-generating it.
  */
 
-#ifndef APPADAPTOR_H_1297288327
-#define APPADAPTOR_H_1297288327
+#ifndef APPADAPTOR_H_1301356598
+#define APPADAPTOR_H_1301356598
 
 #include <QtCore/QObject>
 #include <QtDBus/QtDBus>
@@ -33,6 +33,7 @@ class MeeGoAppAdaptor: public QDBusAbstractAdaptor
 "    <method name=\"raise\">\n"
 "      <arg type=\"as\" name=\"cmdline\"/>\n"
 "    </method>\n"
+"    <method name=\"hide\"/>\n"
 "  </interface>\n"
         "")
 public:
@@ -41,6 +42,7 @@ public:
 
 public: // PROPERTIES
 public Q_SLOTS: // METHODS
+    void hide();
     void raise(const QStringList &cmdline);
 Q_SIGNALS: // SIGNALS
 };

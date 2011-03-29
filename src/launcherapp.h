@@ -46,6 +46,7 @@ public:
 public slots:
     void appPageLoaded();
     void raise(const QStringList& args);
+    void hide();
     void keyboardActive();
     void keyboardTimeout();
 
