@@ -7,11 +7,7 @@
  */
 
 #include <QPluginLoader>
-#include <QInputContext>
 #include <QObject>
-#include <QOrientationReading>
-#include <QOrientationSensor>
-#include <QOrientationFilter>
 #include <cstdlib>
 
 #include "launcherapp.h"
@@ -20,49 +16,6 @@
 #include "forwardingdelegate.h"
 
 QTM_USE_NAMESPACE
-
-// Copied from libmeegotouch, which we don't link against.  We need it
-// defined so we can connect a signal to the MInputContext object
-// (loaded from a plugin) that uses this type.
-namespace M {
-    enum OrientationAngle { Angle0=0, Angle90=90, Angle180=180, Angle270=270 };
-}
-
-class OrientationSensorFilter : public QOrientationFilter
-{
-    bool filter(QOrientationReading *reading)
-    {
-        int qmlOrient;
-        M::OrientationAngle mtfOrient;
-        switch (reading->orientation())
-        {
-        case QOrientationReading::LeftUp:
-            mtfOrient = M::Angle270;
-            qmlOrient = 2;
-            break;
-        case QOrientationReading::TopDown:
-            mtfOrient = M::Angle180;
-            qmlOrient = 3;
-            break;
-        case QOrientationReading::RightUp:
-            mtfOrient = M::Angle90;
-            qmlOrient = 0;
-            break;
-        default: // assume QOrientationReading::TopUp
-            mtfOrient = M::Angle0;
-            qmlOrient = 1;
-            break;
-        }
-
-        ((LauncherApp*)qApp)->setOrientation(qmlOrient);
-
-        // Need to tell the MInputContext plugin to rotate the VKB too
-        QMetaObject::invokeMethod(qApp->inputContext(),
-                                  "notifyOrientationChanged",
-                                  Q_ARG(M::OrientationAngle, mtfOrient));
-        return false;
-    }
-};
 
 int main(int argc, char *argv[])
 {
@@ -80,6 +33,7 @@ int main(int argc, char *argv[])
     QString cmd;
     QString cdata;
     QString app;
+
     for (int i=1; i<argc; i++)
     {
         QString s(argv[i]);
@@ -115,14 +69,25 @@ int main(int argc, char *argv[])
         }
     }
 
-    QString identifier = QString(app);
-    LauncherApp a(argc, argv, identifier, noRaise);
+    // Set up application
+    LauncherApp a(argc, argv);
+    a.setApplicationName(app);
+    a.dbusInit(argc, argv);
 
-    initAtoms ();
+    // Set up X stuff
+    initAtoms();
 
-    LauncherWindow *window = new LauncherWindow(fullscreen, width, height, opengl, noRaise);
+    // Create window
+    LauncherWindow *window = new LauncherWindow(fullscreen, width, height, opengl);
     if (!noRaise)
+    {
+        qDebug("Raising window");
         window->show();
+    }
+    else
+    {
+        qDebug("Not raising window");
+    }
 
     if (!cmd.isEmpty() || !cdata.isEmpty())
     {
@@ -132,14 +97,6 @@ int main(int argc, char *argv[])
 
         new ForwardingDelegate(list, window, &a);
     }
-
-    QOrientationSensor sensor;
-    OrientationSensorFilter filter;
-    sensor.addFilter(&filter);
-    sensor.start();
-
-    QObject::connect(&a, SIGNAL(startOrientationSensor()), &sensor, SLOT(start()));
-    QObject::connect(&a, SIGNAL(stopOrientationSensor()), &sensor, SLOT(stop()));
 
     foreach (QString path, QCoreApplication::libraryPaths())
     {

@@ -68,9 +68,8 @@ QNetworkAccessManager *NetworkAccessManagerFactory::create(QObject *parent)
     return nam;
 }
 
-LauncherWindow::LauncherWindow(bool fullscreen, int width, int height, bool opengl, bool noRaise, bool setSource, QWidget *parent) :
-    QWidget(parent),
-    m_actualOrientation(0)
+LauncherWindow::LauncherWindow(bool fullscreen, int width, int height, bool opengl, bool setSource, QWidget *parent) :
+    QWidget(parent)
 {
     LauncherApp *app = static_cast<LauncherApp *>(qApp);
 
@@ -154,9 +153,6 @@ LauncherWindow::LauncherWindow(bool fullscreen, int width, int height, bool open
     }
 
     setGeometry(QRect(0, 0, screenWidth, screenHeight));
-
-    if (!noRaise)
-        view->show();
 }
 
 LauncherWindow::~LauncherWindow()

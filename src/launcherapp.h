@@ -11,6 +11,9 @@
 
 #include <QApplication>
 #include <QTimer>
+#include <QOrientationSensor>
+
+QTM_USE_NAMESPACE
 
 class QSettings;
 
@@ -22,7 +25,8 @@ class LauncherApp : public QApplication
     Q_PROPERTY(int foregroundWindow READ getForegroundWindow NOTIFY foregroundWindowChanged);
 
 public:
-    explicit LauncherApp(int &argc, char **argv, const QString &appIdentifier, bool noRaise);
+    explicit LauncherApp(int &argc, char **argv);
+    void dbusInit(int argc, char** argv);
 
     int getOrientation() {
         return orientation;
@@ -60,8 +64,10 @@ signals:
 protected:
     virtual bool x11EventFilter(XEvent *event);
 
+private slots:
+    void onOrientationChanged();
+
 private:
-    void dbusInit(int argc, char** argv);
 
     int orientation;
     bool orientationLocked;
@@ -75,6 +81,7 @@ private:
     int lastButtonY;
     QTimer keyboardTimer;
     bool keyboardIsActive;
+    QOrientationSensor orientationSensor;
 };
 
 #endif // LAUNCHER_APP_H

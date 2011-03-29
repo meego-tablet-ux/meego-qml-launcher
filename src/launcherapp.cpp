@@ -12,8 +12,13 @@
 #include <stdio.h>
 #include <QX11Info>
 #include <X11/Xatom.h>
+#include <QInputContext>
 #include <QInputContextFactory>
 #include <cstdlib>
+
+// Mobility
+#include <QOrientationReading>
+#include <QOrientationSensor>
 
 #include "launcherapp.h"
 #include "launcheratoms.h"
@@ -48,15 +53,13 @@ void messageHandler(QtMsgType type, const char *msg)
     }
 }
 
-LauncherApp::LauncherApp(int &argc, char **argv, const QString &appIdentifier, bool noRaise) :
+LauncherApp::LauncherApp(int &argc, char **argv) :
     QApplication(argc, argv),
     orientation(1),
-    noRaise(noRaise),
     foregroundWindow(0)
 {
-    setApplicationName(appIdentifier);
-
-    dbusInit(argc, argv);
+    orientationSensor.start();
+    connect(&orientationSensor, SIGNAL(readingChanged()), SLOT(onOrientationChanged()));
 
     QString theme = MGConfItem("/meego/ux/theme").value().toString();
     QString themeFile = QString("/usr/share/themes/") + theme + "/theme.ini";
@@ -72,7 +75,7 @@ LauncherApp::LauncherApp(int &argc, char **argv, const QString &appIdentifier, b
     QInputContext *ic = QInputContextFactory::create("MInputContext", 0);
     if(ic) {
         setInputContext(ic);
-        connect((QObject*)ic, SIGNAL(keyboardActive()), this, SLOT(keyboardActive()));
+        connect(ic, SIGNAL(keyboardActive()), this, SLOT(keyboardActive()));
     }
 
     qInstallMsgHandler(messageHandler);
@@ -249,7 +252,55 @@ void LauncherApp::setOrientationLocked(bool locked)
 {
     orientationLocked = locked;
     if (locked)
+    {
+        orientationSensor.stop();
         emit stopOrientationSensor();
+    }
     else
+    {
+        orientationSensor.start();
         emit startOrientationSensor();
+    }
+}
+
+// Copied from libmeegotouch, which we don't link against.  We need it
+// defined so we can connect a signal to the MInputContext object
+// (loaded from a plugin) that uses this type.
+namespace M {
+    enum OrientationAngle { Angle0=0, Angle90=90, Angle180=180, Angle270=270 };
+}
+
+void LauncherApp::onOrientationChanged()
+{
+    int orientation = orientationSensor.reading()->orientation();
+
+    qDebug("Handling orientation %d", orientation);
+    int qmlOrient;
+    M::OrientationAngle mtfOrient;
+    switch (orientation)
+    {
+    case QOrientationReading::LeftUp:
+        mtfOrient = M::Angle270;
+        qmlOrient = 2;
+        break;
+    case QOrientationReading::TopDown:
+        mtfOrient = M::Angle180;
+        qmlOrient = 3;
+        break;
+    case QOrientationReading::RightUp:
+        mtfOrient = M::Angle90;
+        qmlOrient = 0;
+        break;
+    default: // assume QOrientationReading::TopUp
+        mtfOrient = M::Angle0;
+        qmlOrient = 1;
+        break;
+    }
+
+    ((LauncherApp*)qApp)->setOrientation(qmlOrient);
+
+    // Need to tell the MInputContext plugin to rotate the VKB too
+    QMetaObject::invokeMethod(inputContext(),
+                              "notifyOrientationChanged",
+                              Q_ARG(M::OrientationAngle, mtfOrient));
 }

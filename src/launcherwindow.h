@@ -19,10 +19,10 @@ class LauncherWindow : public QWidget
 {
     Q_OBJECT
     Q_PROPERTY(int winId READ winId NOTIFY winIdChanged)
-    Q_PROPERTY(int actualOrientation READ actualOrientation WRITE setActualOrientation)
+    Q_PROPERTY(int actualOrientation  READ actualOrientation WRITE setActualOrientation)
 
 public:
-    LauncherWindow(bool fullscreen, int width, int height, bool opengl, bool noRaise, bool setSource = true, QWidget *parent = NULL);
+    LauncherWindow(bool fullscreen, int width, int height, bool opengl, bool setSource = true, QWidget *parent = NULL);
     ~LauncherWindow();
 
     void forwardCall(const QStringList& parameters);
