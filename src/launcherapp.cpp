@@ -202,12 +202,12 @@ bool LauncherApp::x11EventFilter(XEvent *event)
             lastButtonTime = xi->time;
             lastButtonX = xi->root_x;
             lastButtonY = xi->root_y;
+            keyboardIsActive = false;
         } else if(xi->evtype == XI_ButtonRelease) {
             unsigned long dt = xi->time - lastButtonTime;
             int dx = abs(xi->root_x - lastButtonX);
             int dy = abs(xi->root_y - lastButtonY);
             if(dt < TAP_TIME_MS && dx < TAP_SIZE && dy < TAP_SIZE) {
-                keyboardIsActive = false;
                 keyboardTimer.singleShot(KEYBOARD_DISMISS_TIMEOUT, this,
                                          SLOT(keyboardTimeout()));
             }
