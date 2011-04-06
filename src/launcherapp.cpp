@@ -184,36 +184,6 @@ bool LauncherApp::x11EventFilter(XEvent *event)
 {
     Display *dpy = QX11Info::display();
 
-    // Detect a "tap" anywhere in the app (uses any button ID, not
-    // just the first: you can "tap" with a second finger for example,
-    // not sure if that's semantically correct or not...) by snooping
-    // the events.  Use this to dismiss the virtual keyboard.
-    //
-    // Note: we have to use XInput2 here, because that's what the Qt
-    // is selecting for.  And the interaction is subtle: XInput2
-    // requires that there be a XGetEventData() call to retrieve the
-    // new-style/big event structure, and while we're at the head of
-    // the event handling here, Qt has *already* called this.  So the
-    // XGenericEventCookie::data field is already populated.  Seems
-    // fragile, but works...
-    if(event->type == GenericEvent && event->xcookie.extension == xinputOpcode) {
-        XIDeviceEvent *xi = (XIDeviceEvent*)event->xcookie.data;
-        if(xi->evtype == XI_ButtonPress) {
-            lastButtonTime = xi->time;
-            lastButtonX = xi->root_x;
-            lastButtonY = xi->root_y;
-        } else if(xi->evtype == XI_ButtonRelease) {
-            unsigned long dt = xi->time - lastButtonTime;
-            int dx = abs(xi->root_x - lastButtonX);
-            int dy = abs(xi->root_y - lastButtonY);
-            if(dt < TAP_TIME_MS && dx < TAP_SIZE && dy < TAP_SIZE) {
-                keyboardIsActive = false;
-                keyboardTimer.singleShot(KEYBOARD_DISMISS_TIMEOUT, this,
-                                         SLOT(keyboardTimeout()));
-            }
-        }
-    }
-
     Atom activeWindowAtom = getAtom(ATOM_NET_ACTIVE_WINDOW);
 
     // Foreground window detection
