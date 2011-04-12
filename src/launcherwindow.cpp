@@ -230,6 +230,13 @@ void LauncherWindow::setInhibitScreenSaver(bool inhibit)
     m_inhibitScreenSaver = inhibit;
 
     Atom inhibitAtom = XInternAtom(QX11Info::display(), "_MEEGO_INHIBIT_SCREENSAVER", false);
-    XChangeProperty(QX11Info::display(), winId(), inhibitAtom, XA_CARDINAL, 32,
-                    PropModeReplace, (unsigned char*)&m_inhibitScreenSaver, 1);
+    if (inhibit)
+    {
+        XChangeProperty(QX11Info::display(), winId(), inhibitAtom, XA_CARDINAL, 32,
+                        PropModeReplace, (unsigned char*)&m_inhibitScreenSaver, 1);
+    }
+    else
+    {
+        XDeleteProperty(QX11Info::display(), winId(), inhibitAtom);
+    }
 }
