@@ -35,11 +35,7 @@ headers.path = $$LAUNCHER_INSTALL_HEADERS/meegoqmllauncher
 CONFIG += create_pc create_prl
 QMAKE_PKGCONFIG_DESCRIPTION = MeeGo QML Launcher
 QMAKE_PKGCONFIG_INCDIR = $$headers.path
-
-install_pkgconfig.files = meegoqmllauncher.pc
-install_pkgconfig.path = $$LAUNCHER_INSTALL_LIBS/pkgconfig
+QMAKE_PKGCONFIG_DESTDIR = pkgconfig
 
 INSTALLS += target \
-    headers \
-    install_pkgconfig
-
+    headers
