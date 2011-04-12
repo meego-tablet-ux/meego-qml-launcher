@@ -69,7 +69,8 @@ QNetworkAccessManager *NetworkAccessManagerFactory::create(QObject *parent)
 }
 
 LauncherWindow::LauncherWindow(bool fullscreen, int width, int height, bool opengl, bool setSource, QWidget *parent) :
-    QWidget(parent)
+    QWidget(parent),
+    m_inhibitScreenSaver(false)
 {
     LauncherApp *app = static_cast<LauncherApp *>(qApp);
 
@@ -222,4 +223,13 @@ bool LauncherWindow::event (QEvent * event)
         setActualOrientation(m_actualOrientation);
     }
     return QWidget::event(event);
+}
+
+void LauncherWindow::setInhibitScreenSaver(bool inhibit)
+{
+    m_inhibitScreenSaver = inhibit;
+
+    Atom inhibitAtom = XInternAtom(QX11Info::display(), "_MEEGO_INHIBIT_SCREENSAVER", false);
+    XChangeProperty(QX11Info::display(), winId(), inhibitAtom, XA_CARDINAL, 32,
+                    PropModeReplace, (unsigned char*)&m_inhibitScreenSaver, 1);
 }

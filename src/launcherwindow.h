@@ -20,6 +20,7 @@ class LauncherWindow : public QWidget
     Q_OBJECT
     Q_PROPERTY(int winId READ winId NOTIFY winIdChanged)
     Q_PROPERTY(int actualOrientation  READ actualOrientation WRITE setActualOrientation)
+    Q_PROPERTY(bool inhibitScreenSaver READ inhibitScreenSaver WRITE setInhibitScreenSaver)
 
 public:
     LauncherWindow(bool fullscreen, int width, int height, bool opengl, bool setSource = true, QWidget *parent = NULL);
@@ -32,6 +33,11 @@ public:
         return m_actualOrientation;
     }
     void setActualOrientation(int orientation);
+
+    bool inhibitScreenSaver() {
+        return m_inhibitScreenSaver;
+    }
+    void setInhibitScreenSaver(bool inhibit);
 
 signals:
     void call(const QStringList& parameters);
@@ -63,6 +69,7 @@ private:
     QTranslator mediaTranslator;
     QTranslator appTranslator;
     int m_actualOrientation;
+    bool m_inhibitScreenSaver;
 };
 
 #endif // LAUNCHERWINDOW_H
