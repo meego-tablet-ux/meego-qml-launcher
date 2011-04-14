@@ -199,7 +199,9 @@ void LauncherWindow::dismissKeyboard()
 
 void LauncherWindow::forwardCall(const QStringList& parameters)
 {
+    m_call = parameters;
     emit call(parameters);
+    emit callChanged();
 }
 
 void LauncherWindow::setActualOrientation(int orientation)

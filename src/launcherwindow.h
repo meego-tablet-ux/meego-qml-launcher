@@ -21,6 +21,7 @@ class LauncherWindow : public QWidget
     Q_PROPERTY(int winId READ winId NOTIFY winIdChanged)
     Q_PROPERTY(int actualOrientation  READ actualOrientation WRITE setActualOrientation)
     Q_PROPERTY(bool inhibitScreenSaver READ inhibitScreenSaver WRITE setInhibitScreenSaver)
+    Q_PROPERTY(QStringList call READ getCall NOTIFY callChanged)
 
 public:
     LauncherWindow(bool fullscreen, int width, int height, bool opengl, bool setSource = true, QWidget *parent = NULL);
@@ -39,10 +40,15 @@ public:
     }
     void setInhibitScreenSaver(bool inhibit);
 
+    QStringList getCall() {
+        return m_call;
+    }
+
 signals:
     void call(const QStringList& parameters);
     void winIdChanged();
     void vkbHeight(int height);
+    void callChanged();
 
 public slots:
     void triggerSystemUIMenu();
@@ -70,6 +76,7 @@ private:
     QTranslator appTranslator;
     int m_actualOrientation;
     bool m_inhibitScreenSaver;
+    QStringList m_call;
 };
 
 #endif // LAUNCHERWINDOW_H
