@@ -191,9 +191,12 @@ void LauncherWindow::goHome()
 // (bug in MInputContext?)
 void LauncherWindow::dismissKeyboard()
 {
-    if(view->scene() && view->scene()->focusItem()) {
-        view->scene()->focusItem()->clearFocus();
-        QMetaObject::invokeMethod(qApp->inputContext(), "hideOnFocusOut");
+    if(view->scene() && view->scene()->focusItem())
+    {
+        if (QMetaObject::invokeMethod(qApp->inputContext(), "hideOnFocusOut"))
+        {
+            view->scene()->focusItem()->clearFocus();
+        }
     }
 }
 
