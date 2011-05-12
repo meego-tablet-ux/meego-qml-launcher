@@ -69,6 +69,9 @@ int main(int argc, char *argv[])
         }
     }
 
+    // Fix for BMC #17521
+    XInitThreads();
+
     // Set up application
     LauncherApp a(argc, argv);
     a.setApplicationName(app);
