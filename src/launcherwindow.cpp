@@ -92,6 +92,10 @@ LauncherWindow::LauncherWindow(bool fullscreen, int width, int height, bool open
     }
 
     view = new QDeclarativeView(this);
+    view->setAttribute(Qt::WA_OpaquePaintEvent);
+    view->setAttribute(Qt::WA_NoSystemBackground);
+    view->viewport()->setAttribute(Qt::WA_OpaquePaintEvent);
+    view->viewport()->setAttribute(Qt::WA_NoSystemBackground);
     view->engine()->setNetworkAccessManagerFactory(new NetworkAccessManagerFactory);
     connect(view->engine(), SIGNAL(quit()), qApp, SLOT(closeAllWindows()));
     connect((const QObject*)qApp->inputContext(), SIGNAL(inputMethodAreaChanged(QRect)),
@@ -151,6 +155,10 @@ LauncherWindow::LauncherWindow(bool fullscreen, int width, int height, bool open
         QGLFormat format = QGLFormat::defaultFormat();
         format.setSampleBuffers(false);
         view->setViewport(new QGLWidget(format));
+        view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+        view->viewport()->setAttribute(Qt::WA_OpaquePaintEvent);
+        view->viewport()->setAttribute(Qt::WA_NoSystemBackground);
+        //view->viewport()->setAutoFillBackground(false);
     }
 
     setGeometry(QRect(0, 0, screenWidth, screenHeight));
