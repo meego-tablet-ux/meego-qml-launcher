@@ -25,6 +25,9 @@ public:
     LauncherWindow(bool fullscreen, int width, int height, bool opengl, bool doSetSource = true, QWidget *parent = NULL);
     ~LauncherWindow();
 
+    void init(bool fullscreen, int width, int height, bool opengl,
+              bool setSource = true);
+
     void forwardCall(const QStringList& parameters);
 
     int actualOrientation() {
@@ -69,7 +72,8 @@ public slots:
     void dismissKeyboard();
 
 private slots:
-    void loadTranslators();
+    void loadCommonTranslators();
+    void loadAppTranslators();
     void updateOrientationSensorOn();
     void doSwitchToGLRendering();
 

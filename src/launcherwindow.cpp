@@ -38,6 +38,8 @@
 #include "launcheratoms.h"
 #include "launcherapp.h"
 
+#include "meegoqmllauncher.h"
+
 #include <QX11Info>
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
@@ -76,35 +78,19 @@ LauncherWindow::LauncherWindow(bool fullscreen, int width, int height, bool open
 {
     LauncherApp *app = static_cast<LauncherApp *>(qApp);
 
-    setWindowTitle(app->applicationName());
-    setWindowIconText(app->applicationName());
-
-    int screenWidth;
-    int screenHeight;
-    if (fullscreen)
-    {
-        screenWidth = qApp->desktop()->rect().width();
-        screenHeight = qApp->desktop()->rect().height();
-        setWindowFlags(Qt::FramelessWindowHint);
-    }
-    else
-    {
-        screenWidth = width;
-        screenHeight = height;
-    }
-
     setAttribute(Qt::WA_OpaquePaintEvent);
     setAttribute(Qt::WA_NoSystemBackground);
 
     engine()->setNetworkAccessManagerFactory(new NetworkAccessManagerFactory);
     connect(engine(), SIGNAL(quit()), qApp, SLOT(closeAllWindows()));
+
     connect((const QObject*)qApp->inputContext(), SIGNAL(inputMethodAreaChanged(QRect)),
             this, SLOT(handleInputMethodAreaChanged(QRect)));
     connect(qApp, SIGNAL(dismissKeyboard()), this, SLOT(dismissKeyboard()));
 
+
     QDeclarativeContext *context = rootContext();
-    context->setContextProperty("screenWidth", screenWidth);
-    context->setContextProperty("screenHeight", screenHeight);
+
     context->setContextProperty("qApp", qApp);
     context->setContextProperty("mainWindow", this);
     context->setContextProperty("theme_name", MGConfItem("/meego/ux/theme").value().toString());
@@ -126,16 +112,8 @@ LauncherWindow::LauncherWindow(bool fullscreen, int width, int height, bool open
         }
     }
 
-    if (doSetSource) {
-      sharePath = QString("/usr/share/") + app->applicationName() + "/";
-      if (!QFile::exists(sharePath + "main.qml"))
-      {
-        qFatal("%s does not exist!", sharePath.toUtf8().data());
-      }
-    }
-
-    loadTranslators();
-    connect(app, SIGNAL(localeSettingsChanged()), this, SLOT(loadTranslators()));
+    loadCommonTranslators();
+    connect(app, SIGNAL(localeSettingsChanged()), this, SLOT(loadCommonTranslators()));
 
     // Qt will search each translator for a string translation, starting with
     // the last translator installed working back to the first translator.
@@ -143,6 +121,55 @@ LauncherWindow::LauncherWindow(bool fullscreen, int width, int height, bool open
     app->installTranslator(&qtTranslator);     // General Qt translations
     app->installTranslator(&commonTranslator); // Common Components translations
     app->installTranslator(&mediaTranslator);  // Common Media translations
+
+    if (app->applicationName() != MeeGoQMLLauncher::preinitialisedAppName)
+    {
+        init(fullscreen, width, height, opengl, doSetSource);
+    }
+}
+
+LauncherWindow::~LauncherWindow()
+{
+}
+
+void LauncherWindow::init(bool fullscreen, int width, int height,
+                          bool opengl, bool doSetSource)
+{
+    m_useOpenGl = opengl;
+
+    LauncherApp *app = static_cast<LauncherApp *>(qApp);
+
+    setWindowTitle(app->applicationName());
+    setWindowIconText(app->applicationName());
+
+    int screenWidth;
+    int screenHeight;
+    if (fullscreen)
+    {
+        screenWidth = qApp->desktop()->rect().width();
+        screenHeight = qApp->desktop()->rect().height();
+        setWindowFlags(Qt::FramelessWindowHint);
+    }
+    else
+    {
+        screenWidth = width;
+        screenHeight = height;
+    }
+
+    QDeclarativeContext *context = rootContext();
+    context->setContextProperty("screenWidth", screenWidth);
+    context->setContextProperty("screenHeight", screenHeight);
+
+    if (doSetSource) {
+        sharePath = QString("/usr/share/") + app->applicationName() + "/";
+        if (!QFile::exists(sharePath + "main.qml"))
+        {
+            qFatal("%s does not exist!", sharePath.toUtf8().data());
+        }
+    }
+
+    loadAppTranslators();
+    connect(app, SIGNAL(localeSettingsChanged()), this, SLOT(loadAppTranslators()));
     app->installTranslator(&appTranslator);    // App specific translations
 
     // Switch to GL rendering if it's available
@@ -150,7 +177,7 @@ LauncherWindow::LauncherWindow(bool fullscreen, int width, int height, bool open
 
     if (doSetSource)
     {
-      setSource(QUrl(sharePath + "main.qml"));
+        setSource(QUrl(sharePath + "main.qml"));
     }
 
     setGeometry(QRect(0, 0, screenWidth, screenHeight));
@@ -158,9 +185,6 @@ LauncherWindow::LauncherWindow(bool fullscreen, int width, int height, bool open
     connect(app, SIGNAL(foregroundWindowChanged()), this, SLOT(updateOrientationSensorOn()));
 }
 
-LauncherWindow::~LauncherWindow()
-{
-}
 void LauncherWindow::keyPressEvent ( QKeyEvent * event )
 {
     if ((event->modifiers() & Qt::ControlModifier) && event->key() == Qt::Key_R)
@@ -182,16 +206,21 @@ void LauncherWindow::keyPressEvent ( QKeyEvent * event )
 
     QDeclarativeView::keyPressEvent(event);
 }
-void LauncherWindow::loadTranslators()
-{
-    LauncherApp *app = static_cast<LauncherApp *>(qApp);
 
+void LauncherWindow::loadCommonTranslators()
+{
     qtTranslator.load("qt_" + QLocale::system().name() + ".qm",
                       QLibraryInfo::location(QLibraryInfo::TranslationsPath));
     commonTranslator.load("meegolabs-ux-components_" + QLocale::system().name() + ".qm",
                           QLibraryInfo::location(QLibraryInfo::TranslationsPath));
     mediaTranslator.load("meego-ux-media-qml_" + QLocale::system().name() + ".qm",
                          QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+}
+
+void LauncherWindow::loadAppTranslators()
+{
+    LauncherApp *app = static_cast<LauncherApp *>(qApp);
+
     appTranslator.load(app->applicationName() + "_" + QLocale::system().name() + ".qm",
                        QLibraryInfo::location(QLibraryInfo::TranslationsPath));
 }
@@ -255,7 +284,7 @@ bool LauncherWindow::event (QEvent * event)
 void LauncherWindow::setInhibitScreenSaver(bool inhibit)
 {
     m_inhibitScreenSaver = inhibit;
-
+    
     Atom inhibitAtom = XInternAtom(QX11Info::display(), "_MEEGO_INHIBIT_SCREENSAVER", false);
     if (inhibit)
     {
