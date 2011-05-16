@@ -24,8 +24,11 @@ class LauncherWindow : public QWidget
     Q_PROPERTY(QStringList call READ getCall NOTIFY callChanged)
 
 public:
-    LauncherWindow(bool fullscreen, int width, int height, bool opengl, bool setSource = true, QWidget *parent = NULL);
+    LauncherWindow(QWidget *parent = NULL);
     ~LauncherWindow();
+
+    void init(bool fullscreen, int width, int height, bool opengl,
+              bool setSource = true);
 
     void forwardCall(const QStringList& parameters);
     QDeclarativeView* getDeclarativeView() {return view;}
@@ -62,7 +65,8 @@ public slots:
     void dismissKeyboard();
 
 private slots:
-    void loadTranslators();
+    void loadCommonTranslators();
+    void loadAppTranslators();
 
 protected:
     bool event(QEvent * event);

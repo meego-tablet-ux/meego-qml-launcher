@@ -11,13 +11,15 @@ TEMPLATE = lib
 SOURCES += launcherwindow.cpp \
     launcherapp.cpp \
     launcheratoms.cpp \
+    meegoqmllauncher.cpp \
     appproxy.cpp \
     appadaptor.cpp 
 
 HEADERSINSTALL = \
     launcherwindow.h \
     launcherapp.h \
-    launcheratoms.h
+    launcheratoms.h \
+    meegoqmllauncher.h
 
 HEADERS += $$HEADERSINSTALL \
     forwardingdelegate.h \

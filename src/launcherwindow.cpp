@@ -68,28 +68,11 @@ QNetworkAccessManager *NetworkAccessManagerFactory::create(QObject *parent)
     return nam;
 }
 
-LauncherWindow::LauncherWindow(bool fullscreen, int width, int height, bool opengl, bool setSource, QWidget *parent) :
+LauncherWindow::LauncherWindow(QWidget *parent) :
     QWidget(parent),
     m_inhibitScreenSaver(false)
 {
     LauncherApp *app = static_cast<LauncherApp *>(qApp);
-
-    setWindowTitle(app->applicationName());
-    setWindowIconText(app->applicationName());
-
-    int screenWidth;
-    int screenHeight;
-    if (fullscreen)
-    {
-        screenWidth = qApp->desktop()->rect().width();
-        screenHeight = qApp->desktop()->rect().height();
-        setWindowFlags(Qt::FramelessWindowHint);
-    }
-    else
-    {
-        screenWidth = width;
-        screenHeight = height;
-    }
 
     view = new QDeclarativeView(this);
     view->setAttribute(Qt::WA_OpaquePaintEvent);
@@ -103,8 +86,6 @@ LauncherWindow::LauncherWindow(bool fullscreen, int width, int height, bool open
     connect(qApp, SIGNAL(dismissKeyboard()), this, SLOT(dismissKeyboard()));
 
     QDeclarativeContext *context = view->rootContext();
-    context->setContextProperty("screenWidth", screenWidth);
-    context->setContextProperty("screenHeight", screenHeight);
     context->setContextProperty("qApp", qApp);
     context->setContextProperty("mainWindow", this);
     context->setContextProperty("theme_name", MGConfItem("/meego/ux/theme").value().toString());
@@ -126,16 +107,8 @@ LauncherWindow::LauncherWindow(bool fullscreen, int width, int height, bool open
         }
     }
 
-    if (setSource) {
-      sharePath = QString("/usr/share/") + app->applicationName() + "/";
-      if (!QFile::exists(sharePath + "main.qml"))
-      {
-        qFatal("%s does not exist!", sharePath.toUtf8().data());
-      }
-    }
-
-    loadTranslators();
-    connect(app, SIGNAL(localeSettingsChanged()), this, SLOT(loadTranslators()));
+    loadCommonTranslators();
+    connect(app, SIGNAL(localeSettingsChanged()), this, SLOT(loadCommonTranslators()));
 
     // Qt will search each translator for a string translation, starting with
     // the last translator installed working back to the first translator.
@@ -143,6 +116,48 @@ LauncherWindow::LauncherWindow(bool fullscreen, int width, int height, bool open
     app->installTranslator(&qtTranslator);     // General Qt translations
     app->installTranslator(&commonTranslator); // Common Components translations
     app->installTranslator(&mediaTranslator);  // Common Media translations
+}
+
+LauncherWindow::~LauncherWindow()
+{
+}
+
+void LauncherWindow::init(bool fullscreen, int width, int height,
+                          bool opengl, bool setSource)
+{
+    LauncherApp *app = static_cast<LauncherApp *>(qApp);
+
+    setWindowTitle(app->applicationName());
+    setWindowIconText(app->applicationName());
+
+    int screenWidth;
+    int screenHeight;
+    if (fullscreen)
+    {
+        screenWidth = qApp->desktop()->rect().width();
+        screenHeight = qApp->desktop()->rect().height();
+        setWindowFlags(Qt::FramelessWindowHint);
+    }
+    else
+    {
+        screenWidth = width;
+        screenHeight = height;
+    }
+
+    QDeclarativeContext *context = view->rootContext();
+    context->setContextProperty("screenWidth", screenWidth);
+    context->setContextProperty("screenHeight", screenHeight);
+
+    if (setSource) {
+        sharePath = QString("/usr/share/") + app->applicationName() + "/";
+        if (!QFile::exists(sharePath + "main.qml"))
+        {
+            qFatal("%s does not exist!", sharePath.toUtf8().data());
+        }
+    }
+
+    loadAppTranslators();
+    connect(app, SIGNAL(localeSettingsChanged()), this, SLOT(loadAppTranslators()));
     app->installTranslator(&appTranslator);    // App specific translations
 
     if (setSource)
@@ -163,20 +178,20 @@ LauncherWindow::LauncherWindow(bool fullscreen, int width, int height, bool open
     setGeometry(QRect(0, 0, screenWidth, screenHeight));
 }
 
-LauncherWindow::~LauncherWindow()
+void LauncherWindow::loadCommonTranslators()
 {
-}
-
-void LauncherWindow::loadTranslators()
-{
-    LauncherApp *app = static_cast<LauncherApp *>(qApp);
-
     qtTranslator.load("qt_" + QLocale::system().name() + ".qm",
                       QLibraryInfo::location(QLibraryInfo::TranslationsPath));
     commonTranslator.load("meegolabs-ux-components_" + QLocale::system().name() + ".qm",
                           QLibraryInfo::location(QLibraryInfo::TranslationsPath));
     mediaTranslator.load("meego-ux-media-qml_" + QLocale::system().name() + ".qm",
                          QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+}
+
+void LauncherWindow::loadAppTranslators()
+{
+    LauncherApp *app = static_cast<LauncherApp *>(qApp);
+
     appTranslator.load(app->applicationName() + "_" + QLocale::system().name() + ".qm",
                        QLibraryInfo::location(QLibraryInfo::TranslationsPath));
 }
@@ -240,7 +255,7 @@ bool LauncherWindow::event (QEvent * event)
 void LauncherWindow::setInhibitScreenSaver(bool inhibit)
 {
     m_inhibitScreenSaver = inhibit;
-
+    
     Atom inhibitAtom = XInternAtom(QX11Info::display(), "_MEEGO_INHIBIT_SCREENSAVER", false);
     if (inhibit)
     {
