@@ -173,6 +173,7 @@ void LauncherWindow::init(bool fullscreen, int width, int height,
         view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
         view->viewport()->setAttribute(Qt::WA_OpaquePaintEvent);
         view->viewport()->setAttribute(Qt::WA_NoSystemBackground);
+        view->viewport()->setAutoFillBackground(false);
     }
 
     setGeometry(QRect(0, 0, screenWidth, screenHeight));
