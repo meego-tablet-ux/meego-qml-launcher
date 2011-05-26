@@ -47,7 +47,7 @@ public:
 signals:
     void call(const QStringList& parameters);
     void winIdChanged();
-    void vkbHeight(int height);
+    void vkbHeight(int x, int y, int width, int height);
     void callChanged();
 
 public slots:
@@ -57,7 +57,7 @@ public slots:
         return internalWinId();
     }
     void handleInputMethodAreaChanged(const QRect &newArea) {
-        emit vkbHeight(newArea.height());
+        emit vkbHeight(newArea.x(), newArea.y(), newArea.width(), newArea.height());
     }
     void dismissKeyboard();
 
