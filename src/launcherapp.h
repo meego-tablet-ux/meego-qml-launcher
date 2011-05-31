@@ -45,8 +45,6 @@ public:
         return foregroundWindow;
     }
 
-    void setOrientationSensorOn(bool value);
-
     QSettings *themeConfig;
 
 public slots:
@@ -55,6 +53,7 @@ public slots:
     void hide();
     void keyboardActive();
     void keyboardTimeout();
+    void setOrientationSensorOn(bool value);
 
 signals:
     void orientationChanged();
