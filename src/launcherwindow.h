@@ -63,6 +63,7 @@ public slots:
 
 private slots:
     void loadTranslators();
+    void updateOrientationSensorOn();
 
 protected:
     bool event(QEvent * event);

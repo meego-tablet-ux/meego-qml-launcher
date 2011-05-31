@@ -256,16 +256,7 @@ bool LauncherApp::x11EventFilter(XEvent *event)
 void LauncherApp::setOrientationLocked(bool locked)
 {
     orientationLocked = locked;
-    if (locked)
-    {
-        orientationSensor.stop();
-        emit stopOrientationSensor();
-    }
-    else
-    {
-        orientationSensor.start();
-        emit startOrientationSensor();
-    }
+    setOrientationSensorOn(!locked);
 }
 
 // Copied from libmeegotouch, which we don't link against.  We need it
@@ -308,4 +299,16 @@ void LauncherApp::onOrientationChanged()
     QMetaObject::invokeMethod(inputContext(),
                               "notifyOrientationChanged",
                               Q_ARG(M::OrientationAngle, mtfOrient));
+}
+
+void LauncherApp::setOrientationSensorOn(bool value)
+{
+    if (value)
+    {
+        orientationSensor.start();
+    }
+    else
+    {
+        orientationSensor.stop();
+    }
 }

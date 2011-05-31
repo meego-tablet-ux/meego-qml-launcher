@@ -161,6 +161,8 @@ LauncherWindow::LauncherWindow(bool fullscreen, int width, int height, bool open
     }
 
     setGeometry(QRect(0, 0, screenWidth, screenHeight));
+
+    connect(app, SIGNAL(foregroundWindowChanged()), this, SLOT(updateOrientationSensorOn()));
 }
 
 LauncherWindow::~LauncherWindow()
@@ -251,4 +253,10 @@ void LauncherWindow::setInhibitScreenSaver(bool inhibit)
     {
         XDeleteProperty(QX11Info::display(), winId(), inhibitAtom);
     }
+}
+
+void LauncherWindow::updateOrientationSensorOn()
+{
+    LauncherApp *app = static_cast<LauncherApp *>(qApp);
+    app->setOrientationSensorOn(app->getForegroundWindow() == winId());
 }
