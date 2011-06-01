@@ -261,14 +261,13 @@ void LauncherWindow::switchToGLRendering()
     if (m_usingGl || !m_useOpenGl)
         return;
 
-    QGLFormat format = QGLFormat::defaultFormat();
-    format.setSampleBuffers(false);
-    view->setViewport(new QGLWidget(format));
-    m_usingGl = true;
+    //go once around event loop to avoid crash in egl
+    QTimer::singleShot(0, this, SLOT(doSwitchToGLRendering()));
 }
 
 void LauncherWindow::switchToSoftwareRendering()
 {
+    qDebug() << "LauncherWindow::switchToSoftwareRendering";
     // no need to change viewport unnecessarily
     if (!m_usingGl)
         return;
@@ -277,3 +276,11 @@ void LauncherWindow::switchToSoftwareRendering()
     m_usingGl = false;
 }
 
+void LauncherWindow::doSwitchToGLRendering()
+{
+    qDebug() << "LauncherWindow::switchToGLRendering";
+    QGLFormat format = QGLFormat::defaultFormat();
+    format.setSampleBuffers(false);
+    view->setViewport(new QGLWidget(format));
+    m_usingGl = true;
+}

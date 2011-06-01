@@ -67,6 +67,7 @@ public slots:
 private slots:
     void loadTranslators();
     void updateOrientationSensorOn();
+    void doSwitchToGLRendering();
 
 protected:
     bool event(QEvent * event);
