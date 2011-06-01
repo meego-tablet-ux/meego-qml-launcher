@@ -35,6 +35,9 @@ public:
     }
     void setActualOrientation(int orientation);
 
+    void switchToGLRendering();
+    void switchToSoftwareRendering();
+
     bool inhibitScreenSaver() {
         return m_inhibitScreenSaver;
     }
@@ -78,6 +81,8 @@ private:
     int m_actualOrientation;
     bool m_inhibitScreenSaver;
     QStringList m_call;
+    bool m_useOpenGl;
+    bool m_usingGl;
 };
 
 #endif // LAUNCHERWINDOW_H

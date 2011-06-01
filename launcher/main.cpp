@@ -72,6 +72,11 @@ int main(int argc, char *argv[])
     // Fix for BMC #17521
     XInitThreads();
 
+    // we never, ever want to be saddled with 'native' graphicssystem, as it is
+    // amazingly slow. set us to 'raster'. this won't impact GL mode, as we are
+    // explicitly using a QGLWidget viewport in those cases.
+    QApplication::setGraphicsSystem("raster");
+
     // Set up application
     LauncherApp a(argc, argv);
     a.setApplicationName(app);

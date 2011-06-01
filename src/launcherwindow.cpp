@@ -70,7 +70,9 @@ QNetworkAccessManager *NetworkAccessManagerFactory::create(QObject *parent)
 
 LauncherWindow::LauncherWindow(bool fullscreen, int width, int height, bool opengl, bool setSource, QWidget *parent) :
     QWidget(parent),
-    m_inhibitScreenSaver(false)
+    m_inhibitScreenSaver(false),
+    m_useOpenGl(opengl),
+    m_usingGl(false)
 {
     LauncherApp *app = static_cast<LauncherApp *>(qApp);
 
@@ -145,19 +147,12 @@ LauncherWindow::LauncherWindow(bool fullscreen, int width, int height, bool open
     app->installTranslator(&mediaTranslator);  // Common Media translations
     app->installTranslator(&appTranslator);    // App specific translations
 
+    // Switch to GL rendering if it's available
+    switchToGLRendering();
+
     if (setSource)
     {
       view->setSource(QUrl(sharePath + "main.qml"));
-    }
-
-    if (opengl)
-    {
-        QGLFormat format = QGLFormat::defaultFormat();
-        format.setSampleBuffers(false);
-        view->setViewport(new QGLWidget(format));
-        view->setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
-        view->viewport()->setAttribute(Qt::WA_OpaquePaintEvent);
-        view->viewport()->setAttribute(Qt::WA_NoSystemBackground);
     }
 
     setGeometry(QRect(0, 0, screenWidth, screenHeight));
@@ -260,3 +255,25 @@ void LauncherWindow::updateOrientationSensorOn()
     LauncherApp *app = static_cast<LauncherApp *>(qApp);
     app->setOrientationSensorOn(app->getForegroundWindow() == winId());
 }
+
+void LauncherWindow::switchToGLRendering()
+{
+    if (m_usingGl || !m_useOpenGl)
+        return;
+
+    QGLFormat format = QGLFormat::defaultFormat();
+    format.setSampleBuffers(false);
+    view->setViewport(new QGLWidget(format));
+    m_usingGl = true;
+}
+
+void LauncherWindow::switchToSoftwareRendering()
+{
+    // no need to change viewport unnecessarily
+    if (!m_usingGl)
+        return;
+
+    view->setViewport(0);
+    m_usingGl = false;
+}
+
