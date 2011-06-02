@@ -161,7 +161,21 @@ LauncherWindow::LauncherWindow(bool fullscreen, int width, int height, bool open
 LauncherWindow::~LauncherWindow()
 {
 }
-
+void LauncherWindow::keyPressEvent ( QKeyEvent * event )
+{
+    if ((event->modifiers() & Qt::AltModifier) && event->key() == Qt::Key_R) {
+        QGraphicsObject* window = view->rootObject();
+        if (window) {
+            QVariant orientation = window->property("orientation");
+            if( orientation.isValid()) {
+                int orient = orientation.toInt();
+                orient = ((orient + 1) % 2);
+                orientation.setValue(orient);
+                window->setProperty("orientation", orientation);
+            }
+        }
+    }
+}
 void LauncherWindow::loadTranslators()
 {
     LauncherApp *app = static_cast<LauncherApp *>(qApp);

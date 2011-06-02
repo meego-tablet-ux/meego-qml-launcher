@@ -68,6 +68,7 @@ private slots:
 
 protected:
     bool event(QEvent * event);
+    void keyPressEvent ( QKeyEvent * event );
 
 private:
     QString sharePath;
