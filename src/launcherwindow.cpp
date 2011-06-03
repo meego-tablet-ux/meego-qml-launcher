@@ -267,7 +267,6 @@ void LauncherWindow::switchToGLRendering()
 
 void LauncherWindow::switchToSoftwareRendering()
 {
-    qDebug() << "LauncherWindow::switchToSoftwareRendering";
     // no need to change viewport unnecessarily
     if (!m_usingGl)
         return;
@@ -278,7 +277,6 @@ void LauncherWindow::switchToSoftwareRendering()
 
 void LauncherWindow::doSwitchToGLRendering()
 {
-    qDebug() << "LauncherWindow::switchToGLRendering";
     QGLFormat format = QGLFormat::defaultFormat();
     format.setSampleBuffers(false);
     view->setViewport(new QGLWidget(format));

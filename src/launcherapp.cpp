@@ -255,15 +255,19 @@ bool LauncherApp::x11EventFilter(XEvent *event)
             // a GL context will reserve a large chunk of RAM (around 10mb per
             // process) which is very, very painful when you've got a lot of
             // running processes.
-            foreach (QWidget *widget, QApplication::topLevelWidgets()) {
+            foreach (QWidget *widget, QApplication::topLevelWidgets()) 
+            {
                 LauncherWindow *lw = qobject_cast<LauncherWindow *>(widget);
 
                 if (!lw)
                     continue;
 
-                if (widget->winId() == w) {
+                if (widget->winId() == w)
+                {
                     lw->switchToGLRendering();
-                } else {
+                }
+                else 
+                {
                     lw->switchToSoftwareRendering();
                 }
             }
