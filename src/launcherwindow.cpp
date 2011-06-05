@@ -175,9 +175,12 @@ void LauncherWindow::keyPressEvent ( QKeyEvent * event )
                 orient = ((orient + 1) % 4);
                 orientation.setValue(orient);
                 window->setProperty("orientation", orientation);
+                return;
             }
         }
     }
+
+    QDeclarativeView::keyPressEvent(event);
 }
 void LauncherWindow::loadTranslators()
 {
