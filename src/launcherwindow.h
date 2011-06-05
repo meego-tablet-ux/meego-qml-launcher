@@ -44,6 +44,13 @@ public:
         return m_call;
     }
 
+    // temporary method to enable existing clients
+    // that still think the LauncherWindow has an
+    // extra outer QWidget
+    QDeclarativeView* getDeclarativeView() {
+        return this;
+    }
+
 signals:
     void call(const QStringList& parameters);
     void winIdChanged();
