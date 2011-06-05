@@ -81,6 +81,8 @@ private:
     QTimer keyboardTimer;
     bool keyboardIsActive;
     QOrientationSensor orientationSensor;
+
+    bool m_enableRenderingSwap;
 };
 
 #endif // LAUNCHER_APP_H

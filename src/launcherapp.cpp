@@ -89,6 +89,12 @@ LauncherApp::LauncherApp(int &argc, char **argv) :
     // QApplication I guess) that collides.  We don't need it, so drop
     // it.
     QDBusConnection::sessionBus().unregisterService("com.nokia.meego-qml-launcher");
+
+    // Enable dynamic switching between gl and software rendering on systems
+    // with graphics architectures that see a benifit in memory usage.
+    MGConfItem *enableSwapItem = new MGConfItem("/meego/ux/EnableDynamicRendering");
+    m_enableRenderingSwap = enableSwapItem->value().toBool();
+    delete enableSwapItem;
 }
 
 void LauncherApp::dbusInit(int argc, char** argv)
@@ -247,27 +253,30 @@ bool LauncherApp::x11EventFilter(XEvent *event)
             XFree(data);
             emit foregroundWindowChanged();
 
-            // Find out if we're in the foreground, and if so, switch to GL
-            // rendering. If we're not, switch to software rendering.
-            //
-            // This is particularly helpful on ARM w/ SGX drivers, where holding
-            // a GL context will reserve a large chunk of RAM (around 10mb per
-            // process) which is very, very painful when you've got a lot of
-            // running processes.
-            foreach (QWidget *widget, QApplication::topLevelWidgets()) 
+            if (m_enableRenderingSwap)
             {
-                LauncherWindow *lw = qobject_cast<LauncherWindow *>(widget);
-
-                if (!lw)
-                    continue;
-
-                if (widget->winId() == w)
+                // Find out if we're in the foreground, and if so, switch to GL
+                // rendering. If we're not, switch to software rendering.
+                //
+                // This is particularly helpful on ARM w/ SGX drivers, where holding
+                // a GL context will reserve a large chunk of RAM (around 10mb per
+                // process) which is very, very painful when you've got a lot of
+                // running processes.
+                foreach (QWidget *widget, QApplication::topLevelWidgets())
                 {
-                    lw->switchToGLRendering();
-                }
-                else 
-                {
-                    lw->switchToSoftwareRendering();
+                    LauncherWindow *lw = qobject_cast<LauncherWindow *>(widget);
+
+                    if (!lw)
+                        continue;
+
+                    if (widget->winId() == w)
+                    {
+                        lw->switchToGLRendering();
+                    }
+                    else
+                    {
+                        lw->switchToSoftwareRendering();
+                    }
                 }
             }
         }
