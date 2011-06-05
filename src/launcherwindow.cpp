@@ -163,13 +163,16 @@ LauncherWindow::~LauncherWindow()
 }
 void LauncherWindow::keyPressEvent ( QKeyEvent * event )
 {
-    if ((event->modifiers() & Qt::AltModifier) && event->key() == Qt::Key_R) {
-        QGraphicsObject* window = view->rootObject();
-        if (window) {
+    if ((event->modifiers() & Qt::ControlModifier) && event->key() == Qt::Key_R)
+    {
+        QGraphicsObject* window = rootObject();
+        if (window)
+        {
             QVariant orientation = window->property("orientation");
-            if( orientation.isValid()) {
+            if(orientation.isValid())
+            {
                 int orient = orientation.toInt();
-                orient = ((orient + 1) % 2);
+                orient = ((orient + 1) % 4);
                 orientation.setValue(orient);
                 window->setProperty("orientation", orientation);
             }
