@@ -11,7 +11,6 @@
 #include <MGConfItem>
 #include <stdio.h>
 #include <QX11Info>
-#include <X11/Xatom.h>
 #include <QInputContext>
 #include <QInputContextFactory>
 #include <cstdlib>
@@ -21,12 +20,12 @@
 #include <QOrientationSensor>
 
 #include "launcherapp.h"
-#include "launcheratoms.h"
 #include "launcherwindow.h"
 #include "appadaptor.h"
 #include "appproxy.h"
 
 #include <X11/extensions/XInput2.h>
+#include "launcheratoms.h" // pulls in X11 headers, so this *must* be last otherwise it might cause odd conflicts with Qt headers
 
 // Tap detection: press/release within 150ms and 20 pixels
 #define TAP_TIME_MS 150

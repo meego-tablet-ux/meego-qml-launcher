@@ -68,8 +68,8 @@ QNetworkAccessManager *NetworkAccessManagerFactory::create(QObject *parent)
     return nam;
 }
 
-LauncherWindow::LauncherWindow(bool fullscreen, int width, int height, bool opengl, bool setSource, QWidget *parent) :
-    QWidget(parent),
+LauncherWindow::LauncherWindow(bool fullscreen, int width, int height, bool opengl, bool doSetSource, QWidget *parent) :
+    QDeclarativeView(parent),
     m_inhibitScreenSaver(false),
     m_useOpenGl(opengl),
     m_usingGl(false)
@@ -93,18 +93,16 @@ LauncherWindow::LauncherWindow(bool fullscreen, int width, int height, bool open
         screenHeight = height;
     }
 
-    view = new QDeclarativeView(this);
-    view->setAttribute(Qt::WA_OpaquePaintEvent);
-    view->setAttribute(Qt::WA_NoSystemBackground);
-    view->viewport()->setAttribute(Qt::WA_OpaquePaintEvent);
-    view->viewport()->setAttribute(Qt::WA_NoSystemBackground);
-    view->engine()->setNetworkAccessManagerFactory(new NetworkAccessManagerFactory);
-    connect(view->engine(), SIGNAL(quit()), qApp, SLOT(closeAllWindows()));
+    setAttribute(Qt::WA_OpaquePaintEvent);
+    setAttribute(Qt::WA_NoSystemBackground);
+
+    engine()->setNetworkAccessManagerFactory(new NetworkAccessManagerFactory);
+    connect(engine(), SIGNAL(quit()), qApp, SLOT(closeAllWindows()));
     connect((const QObject*)qApp->inputContext(), SIGNAL(inputMethodAreaChanged(QRect)),
             this, SLOT(handleInputMethodAreaChanged(QRect)));
     connect(qApp, SIGNAL(dismissKeyboard()), this, SLOT(dismissKeyboard()));
 
-    QDeclarativeContext *context = view->rootContext();
+    QDeclarativeContext *context = rootContext();
     context->setContextProperty("screenWidth", screenWidth);
     context->setContextProperty("screenHeight", screenHeight);
     context->setContextProperty("qApp", qApp);
@@ -128,7 +126,7 @@ LauncherWindow::LauncherWindow(bool fullscreen, int width, int height, bool open
         }
     }
 
-    if (setSource) {
+    if (doSetSource) {
       sharePath = QString("/usr/share/") + app->applicationName() + "/";
       if (!QFile::exists(sharePath + "main.qml"))
       {
@@ -150,9 +148,9 @@ LauncherWindow::LauncherWindow(bool fullscreen, int width, int height, bool open
     // Switch to GL rendering if it's available
     switchToGLRendering();
 
-    if (setSource)
+    if (doSetSource)
     {
-      view->setSource(QUrl(sharePath + "main.qml"));
+      setSource(QUrl(sharePath + "main.qml"));
     }
 
     setGeometry(QRect(0, 0, screenWidth, screenHeight));
@@ -195,11 +193,11 @@ void LauncherWindow::goHome()
 // (bug in MInputContext?)
 void LauncherWindow::dismissKeyboard()
 {
-    if(view->scene() && view->scene()->focusItem())
+    if(scene() && scene()->focusItem())
     {
         if (QMetaObject::invokeMethod(qApp->inputContext(), "hideOnFocusOut"))
         {
-            view->scene()->focusItem()->clearFocus();
+            scene()->focusItem()->clearFocus();
         }
     }
 }
@@ -271,7 +269,12 @@ void LauncherWindow::switchToSoftwareRendering()
     if (!m_usingGl)
         return;
 
-    view->setViewport(0);
+    setViewport(0);
+
+    // each time we create a new viewport widget, we must redo our optimisations
+    setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+    viewport()->setAttribute(Qt::WA_OpaquePaintEvent);
+    viewport()->setAttribute(Qt::WA_NoSystemBackground);
     m_usingGl = false;
 }
 
@@ -279,6 +282,11 @@ void LauncherWindow::doSwitchToGLRendering()
 {
     QGLFormat format = QGLFormat::defaultFormat();
     format.setSampleBuffers(false);
-    view->setViewport(new QGLWidget(format));
+    setViewport(new QGLWidget(format));
+
+    // each time we create a new viewport widget, we must redo our optimisations
+    setViewportUpdateMode(QGraphicsView::FullViewportUpdate);
+    viewport()->setAttribute(Qt::WA_OpaquePaintEvent);
+    viewport()->setAttribute(Qt::WA_NoSystemBackground);
     m_usingGl = true;
 }

@@ -1,6 +1,7 @@
 TARGET = meego-qml-launcher
 TEMPLATE = app
 CONFIG += mobility link_pkgconfig
+QT += declarative
 MOBILITY += sensors
 PKGCONFIG += gconf-2.0 mlite
 

@@ -11,9 +11,9 @@
 #include <cstdlib>
 
 #include "launcherapp.h"
-#include "launcheratoms.h"
 #include "launcherwindow.h"
 #include "forwardingdelegate.h"
+#include "launcheratoms.h" // contains X11 headers, MUST come last
 
 QTM_USE_NAMESPACE
 

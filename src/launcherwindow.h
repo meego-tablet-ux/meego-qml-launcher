@@ -10,12 +10,10 @@
 #define LAUNCHERWINDOW_H
 
 #include <QWidget>
+#include <QDeclarativeView>
 #include <QTranslator>
-#include <X11/X.h>
 
-class QDeclarativeView;
-
-class LauncherWindow : public QWidget
+class LauncherWindow : public QDeclarativeView
 {
     Q_OBJECT
     Q_PROPERTY(int winId READ winId NOTIFY winIdChanged)
@@ -24,11 +22,10 @@ class LauncherWindow : public QWidget
     Q_PROPERTY(QStringList call READ getCall NOTIFY callChanged)
 
 public:
-    LauncherWindow(bool fullscreen, int width, int height, bool opengl, bool setSource = true, QWidget *parent = NULL);
+    LauncherWindow(bool fullscreen, int width, int height, bool opengl, bool doSetSource = true, QWidget *parent = NULL);
     ~LauncherWindow();
 
     void forwardCall(const QStringList& parameters);
-    QDeclarativeView* getDeclarativeView() {return view;}
 
     int actualOrientation() {
         return m_actualOrientation;
@@ -73,7 +70,6 @@ protected:
     bool event(QEvent * event);
 
 private:
-    QDeclarativeView *view;
     QString sharePath;
     QTranslator qtTranslator;
     QTranslator commonTranslator;
