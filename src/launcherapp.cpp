@@ -302,8 +302,7 @@ void LauncherApp::onOrientationChanged()
 {
     int orientation = orientationSensor.reading()->orientation();
 
-    qDebug("Handling orientation %d", orientation);
-    int qmlOrient;
+    int qmlOrient = -1;
     M::OrientationAngle mtfOrient;
     switch (orientation)
     {
@@ -319,11 +318,17 @@ void LauncherApp::onOrientationChanged()
         mtfOrient = M::Angle90;
         qmlOrient = 0;
         break;
-    default: // assume QOrientationReading::TopUp
+    case QOrientationReading::TopUp:
         mtfOrient = M::Angle0;
         qmlOrient = 1;
         break;
+    default:
+        // ignore faceup and facedown events
+        break;
     }
+
+    if (qmlOrient == -1)
+        return;
 
     ((LauncherApp*)qApp)->setOrientation(qmlOrient);
 
