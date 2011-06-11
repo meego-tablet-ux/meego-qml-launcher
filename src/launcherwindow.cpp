@@ -78,8 +78,8 @@ LauncherWindow::LauncherWindow(bool fullscreen, int width, int height, bool open
 {
     LauncherApp *app = static_cast<LauncherApp *>(qApp);
 
-    setAttribute(Qt::WA_OpaquePaintEvent);
-    setAttribute(Qt::WA_NoSystemBackground);
+    viewport()->setAttribute(Qt::WA_OpaquePaintEvent);
+    viewport()->setAttribute(Qt::WA_NoSystemBackground);
 
     engine()->setNetworkAccessManagerFactory(new NetworkAccessManagerFactory);
     connect(engine(), SIGNAL(quit()), qApp, SLOT(closeAllWindows()));
