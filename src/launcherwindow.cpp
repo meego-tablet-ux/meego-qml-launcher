@@ -132,6 +132,10 @@ LauncherWindow::~LauncherWindow()
 {
 }
 
+// Contains parts of the initialization that require correct
+// application name and parameters which can be set on the command
+// line. Application name independent initializations are done in the
+// constructor.
 void LauncherWindow::init(bool fullscreen, int width, int height,
                           bool opengl, bool doSetSource)
 {

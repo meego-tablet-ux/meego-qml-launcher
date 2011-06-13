@@ -25,9 +25,6 @@ public:
     LauncherWindow(bool fullscreen, int width, int height, bool opengl, bool doSetSource = true, QWidget *parent = NULL);
     ~LauncherWindow();
 
-    void init(bool fullscreen, int width, int height, bool opengl,
-              bool setSource = true);
-
     void forwardCall(const QStringList& parameters);
 
     int actualOrientation() {
@@ -81,6 +78,9 @@ protected:
     bool event(QEvent * event);
     void keyPressEvent ( QKeyEvent * event );
 
+    void init(bool fullscreen, int width, int height, bool opengl,
+              bool setSource = true);
+
 private:
     QString sharePath;
     QTranslator qtTranslator;
@@ -92,6 +92,8 @@ private:
     QStringList m_call;
     bool m_useOpenGl;
     bool m_usingGl;
+
+    friend class MeeGoQMLLauncher;
 };
 
 #endif // LAUNCHERWINDOW_H
