@@ -20,6 +20,8 @@
 
 QTM_USE_NAMESPACE
 
+const char * MeeGoQMLLauncher::preinitialisedAppNamePrefix = "preinit-meego-qml-launcher";
+
 namespace {
     bool fullscreen = false;
     bool opengl = false;
@@ -36,18 +38,27 @@ namespace {
     const int MaxArgCount = 64;
     int fakeArgc = 0;
     char **fakeArgv = 0;
+    static char preinitialisedAppName[sizeof(MeeGoQMLLauncher::preinitialisedAppNamePrefix) + 8];
 }
-
-const char * MeeGoQMLLauncher::preinitialisedAppName = "preinit-meego-qml-launcher";
 
 void MeeGoQMLLauncher::prepareForLaunch()
 {
+    static QString appNameFormat(MeeGoQMLLauncher::preinitialisedAppNamePrefix);    
+    appNameFormat += QString("-%1");
+
+    static QByteArray appName;
+
+    // Append pid to appName to make it unique. This is required because the
+    // libminputcontext.so instantiates MComponentData, which in turn registers
+    // a dbus service with the application's name.
+    appName = appNameFormat.arg(getpid()).toLatin1();
+
     const char * emptyString = "";
 
     fakeArgc = MaxArgCount;
     fakeArgv = new char* [fakeArgc];
 
-    fakeArgv[0] = const_cast<char*>(MeeGoQMLLauncher::preinitialisedAppName);
+    fakeArgv[0] = const_cast<char*>(appName.constData()) ;
     for (int i = 1; i < MaxArgCount; i++)
     {
         fakeArgv[i] = const_cast<char*>(emptyString);
@@ -62,7 +73,7 @@ void MeeGoQMLLauncher::prepareForLaunch()
     QApplication::setGraphicsSystem("raster");
 
     launcherApp = new LauncherApp(fakeArgc, fakeArgv);
-    launcherApp->setApplicationName(MeeGoQMLLauncher::preinitialisedAppName);
+    launcherApp->setApplicationName(appName);
 
     // Set up X stuff
     initAtoms();

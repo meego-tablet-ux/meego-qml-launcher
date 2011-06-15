@@ -17,7 +17,7 @@ public:
 
     static int launch(int argc, char **argv);
 
-    static const char * preinitialisedAppName;
+    static const char * preinitialisedAppNamePrefix;
 
 private:
     MeeGoQMLLauncher();

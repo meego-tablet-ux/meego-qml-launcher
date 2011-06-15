@@ -80,6 +80,8 @@ LauncherWindow::LauncherWindow(bool fullscreen, int width, int height, bool open
 
     viewport()->setAttribute(Qt::WA_OpaquePaintEvent);
     viewport()->setAttribute(Qt::WA_NoSystemBackground);
+    setAttribute(Qt::WA_OpaquePaintEvent);
+    setAttribute(Qt::WA_NoSystemBackground);
 
     engine()->setNetworkAccessManagerFactory(new NetworkAccessManagerFactory);
     connect(engine(), SIGNAL(quit()), qApp, SLOT(closeAllWindows()));
@@ -122,7 +124,7 @@ LauncherWindow::LauncherWindow(bool fullscreen, int width, int height, bool open
     app->installTranslator(&commonTranslator); // Common Components translations
     app->installTranslator(&mediaTranslator);  // Common Media translations
 
-    if (app->applicationName() != MeeGoQMLLauncher::preinitialisedAppName)
+    if (!app->applicationName().startsWith(MeeGoQMLLauncher::preinitialisedAppNamePrefix))
     {
         init(fullscreen, width, height, opengl, doSetSource);
     }
