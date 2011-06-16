@@ -284,7 +284,7 @@ bool LauncherWindow::event (QEvent * event)
     {
         setActualOrientation(m_actualOrientation);
     }
-    return QWidget::event(event);
+    return QDeclarativeView::event(event);
 }
 
 void LauncherWindow::setInhibitScreenSaver(bool inhibit)
