@@ -38,16 +38,6 @@
 #include "launcheratoms.h"
 #include "launcherapp.h"
 
-#include <iostream>
-#include <time.h>
-
-static struct timespec start, end;
-long timediff_ms(const struct timespec *t1, const struct timespec *t2)
-{
-    return (t1->tv_sec - t2->tv_sec) * 1000 +
-        (t1->tv_nsec - t2->tv_nsec) / 1000000;
-}
-
 #include "meegoqmllauncher.h"
 
 #include <QX11Info>
@@ -140,10 +130,7 @@ LauncherWindow::LauncherWindow(bool fullscreen, int width, int height, bool open
     }
     else
     {
-        clock_gettime(CLOCK_MONOTONIC, &start);
-        setSource(QUrl("file://tmp/common-imports.qml"));
-        clock_gettime(CLOCK_MONOTONIC, &end);
-        std::cerr << "TAMPERE: setSource(common-imports.qml): " << timediff_ms(&end, &start) << std::endl;
+        setSource(QUrl::fromLocalFile("/usr/share/meego-qml-launcher/common-imports.qml"));
     }
 }
 
@@ -200,10 +187,7 @@ void LauncherWindow::init(bool fullscreen, int width, int height,
 
     if (doSetSource)
     {
-        clock_gettime(CLOCK_MONOTONIC, &start);
         setSource(QUrl(sharePath + "main.qml"));
-        clock_gettime(CLOCK_MONOTONIC, &end);
-        std::cerr << "TAMPERE: setSource(main.qml): " << timediff_ms(&end, &start) << std::endl;
     }
 
     setGeometry(QRect(0, 0, screenWidth, screenHeight));
