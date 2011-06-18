@@ -34,7 +34,7 @@ target.path += $$LAUNCHER_INSTALL_LIBS
 headers.files = $$HEADERSINSTALL
 headers.path = $$LAUNCHER_INSTALL_HEADERS/meegoqmllauncher
 
-common_qml.files = common-imports.mql
+common_qml.files = common-imports.qml
 common_qml.path = $$INSTALL_ROOT/usr/share/meego-qml-launcher
 
 CONFIG += create_pc create_prl
