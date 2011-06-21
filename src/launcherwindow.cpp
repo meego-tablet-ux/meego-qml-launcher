@@ -39,6 +39,7 @@
 #include "launcherapp.h"
 
 #include "meegoqmllauncher.h"
+#include <meegolocale.h>
 
 #include <QX11Info>
 #include <X11/Xlib.h>
@@ -77,6 +78,7 @@ LauncherWindow::LauncherWindow(bool fullscreen, int width, int height, bool open
     m_inhibitScreenSaver(false),
     m_useOpenGl(opengl),
     m_usingGl(false),
+    locale(new meego::Locale(this)),
     m_debugInfoEnabled(true)
 {
     LauncherApp *app = static_cast<LauncherApp *>(qApp);
@@ -187,6 +189,8 @@ void LauncherWindow::init(bool fullscreen, int width, int height,
     loadAppTranslators();
     connect(app, SIGNAL(localeSettingsChanged()), this, SLOT(loadAppTranslators()));
     app->installTranslator(&appTranslator);    // App specific translations
+
+    connect(locale, SIGNAL(localeChanged()), this, SLOT(localeChanged()));
 
     // Switch to GL rendering if it's available
     switchToGLRendering();
@@ -359,6 +363,21 @@ void LauncherWindow::doSwitchToGLRendering()
     viewport()->setAttribute(Qt::WA_OpaquePaintEvent);
     viewport()->setAttribute(Qt::WA_NoSystemBackground);
     m_usingGl = true;
+}
+
+void LauncherWindow::localeChanged()
+{
+    LauncherApp *app = qobject_cast<LauncherApp *>(qApp);
+
+    if(app->getForegroundWindow() != this->winId())
+    {
+	///I'm not in the foreground.  goodbye.
+	app->quit();
+	return;
+    }
+
+    loadCommonTranslators();
+    loadAppTranslators();
 }
 
 void LauncherWindow::debugDirChanged(const QString)

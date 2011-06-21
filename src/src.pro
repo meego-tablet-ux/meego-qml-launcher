@@ -2,7 +2,7 @@ include(../config.pri)
 
 QT += declarative opengl network dbus
 CONFIG += mobility link_pkgconfig
-PKGCONFIG += gconf-2.0 mlite QtOpenGL
+PKGCONFIG += gconf-2.0 mlite QtOpenGL meegolocale
 MOBILITY += sensors
 VERSION = $$LAUNCHER_VERSION
 TARGET = meegoqmllauncher

@@ -14,6 +14,11 @@
 #include <QFileSystemWatcher>
 #include <QTranslator>
 
+namespace meego
+{
+    class Locale;
+}
+
 class LauncherWindow : public QDeclarativeView
 {
     Q_OBJECT
@@ -81,6 +86,7 @@ public slots:
 private slots:
     void loadCommonTranslators();
     void loadAppTranslators();
+    void localeChanged();
     void updateOrientationSensorOn();
     void doSwitchToGLRendering();
     void debugDirChanged(const QString);
@@ -106,6 +112,7 @@ private:
     QStringList m_call;
     bool m_useOpenGl;
     bool m_usingGl;
+    meego::Locale* locale;
 
     bool m_debugInfoEnabled;
     QString m_debugInfo;
