@@ -11,6 +11,7 @@
 
 #include <QWidget>
 #include <QDeclarativeView>
+#include <QFileSystemWatcher>
 #include <QTranslator>
 
 class LauncherWindow : public QDeclarativeView
@@ -20,6 +21,7 @@ class LauncherWindow : public QDeclarativeView
     Q_PROPERTY(int actualOrientation  READ actualOrientation WRITE setActualOrientation)
     Q_PROPERTY(bool inhibitScreenSaver READ inhibitScreenSaver WRITE setInhibitScreenSaver)
     Q_PROPERTY(QStringList call READ getCall NOTIFY callChanged)
+    Q_PROPERTY(QString debugInfo READ getDebugInfo NOTIFY debugInfoChanged);
 
 public:
     LauncherWindow(bool fullscreen, int width, int height, bool opengl, bool doSetSource = true, QWidget *parent = NULL);
@@ -44,6 +46,13 @@ public:
         return m_call;
     }
 
+    QString getDebugInfo() const {
+        if (m_debugInfoEnabled)
+            return m_debugInfo;
+        else
+            return QString();
+    }
+
     // temporary method to enable existing clients
     // that still think the LauncherWindow has an
     // extra outer QWidget
@@ -56,6 +65,7 @@ signals:
     void winIdChanged();
     void vkbHeight(int x, int y, int width, int height);
     void callChanged();
+    void debugInfoChanged();
 
 public slots:
     void triggerSystemUIMenu();
@@ -73,6 +83,8 @@ private slots:
     void loadAppTranslators();
     void updateOrientationSensorOn();
     void doSwitchToGLRendering();
+    void debugDirChanged(const QString);
+    void debugFileChanged(const QString);
 
 protected:
     bool event(QEvent * event);
@@ -82,6 +94,8 @@ protected:
               bool setSource = true);
 
 private:
+    void setEnableDebugInfo(bool);
+
     QString sharePath;
     QTranslator qtTranslator;
     QTranslator commonTranslator;
@@ -92,6 +106,10 @@ private:
     QStringList m_call;
     bool m_useOpenGl;
     bool m_usingGl;
+
+    bool m_debugInfoEnabled;
+    QString m_debugInfo;
+    QFileSystemWatcher m_debugInfoFileWatcher;
 
     friend class MeeGoQMLLauncher;
 };
