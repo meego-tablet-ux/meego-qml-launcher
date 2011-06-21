@@ -77,7 +77,7 @@ LauncherWindow::LauncherWindow(bool fullscreen, int width, int height, bool open
     m_inhibitScreenSaver(false),
     m_useOpenGl(opengl),
     m_usingGl(false),
-    m_debugInfoEnabled(false)
+    m_debugInfoEnabled(true)
 {
     LauncherApp *app = static_cast<LauncherApp *>(qApp);
 
