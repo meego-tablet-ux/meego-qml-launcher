@@ -371,9 +371,17 @@ void LauncherWindow::localeChanged()
 
     if(app->getForegroundWindow() != this->winId())
     {
-	///I'm not in the foreground.  goodbye.
-	app->quit();
-	return;
+	// We want to have all apps properly saving state so that we can
+        // quit the app and then when the app is restored it will startup
+        // with the correct locale.
+        //
+        // But... we need to finish hooking up the bits such that we have
+        // a way of knowing if it's safe to exit instead of adding a stress
+        // test for all apps.  When this capability lands then replace this
+        // block of code with whatever the mechanism is.
+        //  
+	// app->quit();
+	// return;
     }
 
     loadCommonTranslators();
