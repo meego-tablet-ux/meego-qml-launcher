@@ -249,33 +249,37 @@ bool LauncherApp::x11EventFilter(XEvent *event)
         if (result == Success && data != None)
         {
             Window w = *(Window *)data;
-            foregroundWindow = (int)w;
             XFree(data);
-            emit foregroundWindowChanged();
 
-            if (m_enableRenderingSwap)
+            if (!isSystemModelDialog(w))
             {
-                // Find out if we're in the foreground, and if so, switch to GL
-                // rendering. If we're not, switch to software rendering.
-                //
-                // This is particularly helpful on ARM w/ SGX drivers, where holding
-                // a GL context will reserve a large chunk of RAM (around 10mb per
-                // process) which is very, very painful when you've got a lot of
-                // running processes.
-                foreach (QWidget *widget, QApplication::topLevelWidgets())
+                foregroundWindow = (int)w;
+                emit foregroundWindowChanged();
+
+                if (m_enableRenderingSwap)
                 {
-                    LauncherWindow *lw = qobject_cast<LauncherWindow *>(widget);
-
-                    if (!lw)
-                        continue;
-
-                    if (widget->winId() == w)
+                    // Find out if we're in the foreground, and if so, switch to GL
+                    // rendering. If we're not, switch to software rendering.
+                    //
+                    // This is particularly helpful on ARM w/ SGX drivers, where holding
+                    // a GL context will reserve a large chunk of RAM (around 10mb per
+                    // process) which is very, very painful when you've got a lot of
+                    // running processes.
+                    foreach (QWidget *widget, QApplication::topLevelWidgets())
                     {
-                        lw->switchToGLRendering();
-                    }
-                    else
-                    {
-                        lw->switchToSoftwareRendering();
+                        LauncherWindow *lw = qobject_cast<LauncherWindow *>(widget);
+
+                        if (!lw)
+                            continue;
+
+                        if (widget->winId() == w)
+                        {
+                            lw->switchToGLRendering();
+                        }
+                        else
+                        {
+                            lw->switchToSoftwareRendering();
+                        }
                     }
                 }
             }
@@ -348,4 +352,31 @@ void LauncherApp::setOrientationSensorOn(bool value)
     {
         orientationSensor.stop();
     }
+}
+
+bool LauncherApp::isSystemModelDialog(unsigned target)
+{
+    Atom actualType;
+    int actualFormat;
+    unsigned long numWindowItems, bytesLeft;
+    unsigned char *data = NULL;
+
+    int result = XGetWindowProperty(QX11Info::display(),
+                                    target,
+                                    getAtom(ATOM_MEEGO_SYSTEM_DIALOG),
+                                    0, 0x7fffffff,
+                                    false, XA_WINDOW,
+                                    &actualType,
+                                    &actualFormat,
+                                    &numWindowItems,
+                                    &bytesLeft,
+                                    &data);
+
+    if (result == Success && data != None)
+    {
+        XFree(data);
+        return true;
+    }
+
+    return false;
 }

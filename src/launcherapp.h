@@ -67,6 +67,7 @@ private slots:
     void onOrientationChanged();
 
 private:
+    bool isSystemModelDialog(unsigned target);
 
     int orientation;
     bool orientationLocked;

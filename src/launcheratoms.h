@@ -15,6 +15,7 @@
 typedef enum _AtomType {
     ATOM_NET_ACTIVE_WINDOW,
     ATOM_UTF8_STRING,
+    ATOM_MEEGO_SYSTEM_DIALOG,
     ATOM_COUNT
 } AtomType;
 

@@ -18,7 +18,8 @@ static Atom appAtoms[ATOM_COUNT];
 // Keep this in sync with the AtomType enum in atoms.h
 static const char *appAtomNames[ATOM_COUNT] = {
     "_NET_ACTIVE_WINDOW",
-    "UTF8_STRING"
+    "UTF8_STRING",
+    "_MEEGO_SYSTEM_DIALOG"
 };
 
 void initAtoms ()
