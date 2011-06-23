@@ -234,11 +234,11 @@ void LauncherWindow::keyPressEvent ( QKeyEvent * event )
 
 void LauncherWindow::loadCommonTranslators()
 {
-    qtTranslator.load("qt_" + QLocale::system().name() + ".qm",
+    qtTranslator.load("qt_" + locale->locale() + ".qm",
                       QLibraryInfo::location(QLibraryInfo::TranslationsPath));
-    commonTranslator.load("meegolabs-ux-components_" + QLocale::system().name() + ".qm",
+    commonTranslator.load("meegolabs-ux-components_" + locale->locale() + ".qm",
                           QLibraryInfo::location(QLibraryInfo::TranslationsPath));
-    mediaTranslator.load("meego-ux-media-qml_" + QLocale::system().name() + ".qm",
+    mediaTranslator.load("meego-ux-media-qml_" + locale->locale() + ".qm",
                          QLibraryInfo::location(QLibraryInfo::TranslationsPath));
 }
 
@@ -246,7 +246,7 @@ void LauncherWindow::loadAppTranslators()
 {
     LauncherApp *app = static_cast<LauncherApp *>(qApp);
 
-    appTranslator.load(app->applicationName() + "_" + QLocale::system().name() + ".qm",
+    appTranslator.load(app->applicationName() + "_" + locale->locale() + ".qm",
                        QLibraryInfo::location(QLibraryInfo::TranslationsPath));
 }
 
