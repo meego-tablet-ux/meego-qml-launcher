@@ -380,3 +380,15 @@ bool LauncherApp::isSystemModelDialog(unsigned target)
 
     return false;
 }
+
+void LauncherApp::launchDesktopByName(QString name, QString cmd, QString cdata)
+{
+    QString service = "com.lockstatus";
+    QString object = "/query";
+    QString interface = "com.lockstatus.query";
+    QDBusInterface launcher(service, object, interface);
+    if (launcher.isValid())
+    {
+        launcher.asyncCall(QLatin1String("launchDesktopByName"), name, cmd, cdata);
+    }
+}

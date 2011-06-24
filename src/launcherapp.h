@@ -54,6 +54,7 @@ public slots:
     void keyboardActive();
     void keyboardTimeout();
     void setOrientationSensorOn(bool value);
+    void launchDesktopByName(QString name, QString cmd = QString(), QString cdata = QString());
 
 signals:
     void orientationChanged();
