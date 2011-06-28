@@ -74,6 +74,7 @@ void MeeGoQMLLauncher::prepareForLaunch()
 
     launcherApp = new LauncherApp(fakeArgc, fakeArgv);
     launcherApp->setApplicationName(appName);
+    launcherApp->setPreinit(true);
 
     // Set up X stuff
     initAtoms();
@@ -147,6 +148,7 @@ int MeeGoQMLLauncher::launch(int argc, char **argv)
 
     launcherApp->setApplicationName(app);
     launcherApp->dbusInit(argc, argv);
+    launcherApp->setPreinit(false);
 
     launcherWindow->init(fullscreen, width, height, opengl);
     if (!noRaise)

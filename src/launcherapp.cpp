@@ -55,7 +55,8 @@ void messageHandler(QtMsgType type, const char *msg)
 LauncherApp::LauncherApp(int &argc, char **argv) :
     QApplication(argc, argv),
     orientation(1),
-    foregroundWindow(0)
+    foregroundWindow(0),
+    preinit(false)
 {
     connect(&orientationSensor, SIGNAL(readingChanged()), SLOT(onOrientationChanged()));
     orientationSensor.start();
@@ -293,6 +294,12 @@ void LauncherApp::setOrientationLocked(bool locked)
 {
     orientationLocked = locked;
     setOrientationSensorOn(!locked);
+}
+
+void LauncherApp::setPreinit(const bool _preinit)
+{
+    preinit = _preinit;
+    emit preinitChanged();
 }
 
 // Copied from libmeegotouch, which we don't link against.  We need it

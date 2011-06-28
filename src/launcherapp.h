@@ -23,6 +23,7 @@ class LauncherApp : public QApplication
     Q_PROPERTY(int orientation READ getOrientation NOTIFY orientationChanged);
     Q_PROPERTY(bool orientationLocked READ getOrientationLocked WRITE setOrientationLocked);
     Q_PROPERTY(int foregroundWindow READ getForegroundWindow NOTIFY foregroundWindowChanged);
+    Q_PROPERTY(bool preinit READ getPreinit NOTIFY preinitChanged);
 
 public:
     explicit LauncherApp(int &argc, char **argv);
@@ -45,6 +46,12 @@ public:
         return foregroundWindow;
     }
 
+    bool getPreinit() {
+        return preinit;
+    }
+
+    void setPreinit(const bool _preinit);
+
     QSettings *themeConfig;
 
 public slots:
@@ -60,6 +67,7 @@ signals:
     void orientationChanged();
     void foregroundWindowChanged();
     void dismissKeyboard();
+    void preinitChanged();
 
 protected:
     virtual bool x11EventFilter(XEvent *event);
@@ -74,6 +82,7 @@ private:
     bool orientationLocked;
     bool noRaise;
     int foregroundWindow;
+    bool preinit;
 
     int xinputOpcode; // XInput2 extension identifier
 
