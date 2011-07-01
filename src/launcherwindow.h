@@ -71,6 +71,7 @@ signals:
     void vkbHeight(int x, int y, int width, int height);
     void callChanged();
     void debugInfoChanged();
+    void retranslateUi();
 
 public slots:
     void triggerSystemUIMenu();

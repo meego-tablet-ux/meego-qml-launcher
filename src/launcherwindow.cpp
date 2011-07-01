@@ -371,7 +371,7 @@ void LauncherWindow::localeChanged()
 
     if(app->getForegroundWindow() != this->winId())
     {
-	// We want to have all apps properly saving state so that we can
+        // We want to have all apps properly saving state so that we can
         // quit the app and then when the app is restored it will startup
         // with the correct locale.
         //
@@ -380,12 +380,13 @@ void LauncherWindow::localeChanged()
         // test for all apps.  When this capability lands then replace this
         // block of code with whatever the mechanism is.
         //  
-	// app->quit();
-	// return;
+        // app->quit();
+        // return;
     }
 
     loadCommonTranslators();
     loadAppTranslators();
+    retranslateUi();
 }
 
 void LauncherWindow::debugDirChanged(const QString)
