@@ -9,6 +9,7 @@
 #include <QPluginLoader>
 #include <QObject>
 #include <QSettings>
+#include <QDir>
 #include <cstdlib>
 
 #include "launcherapp.h"
@@ -66,6 +67,11 @@ void MeeGoQMLLauncher::prepareForLaunch()
 
     // Fix for BMC #17521
     XInitThreads();
+
+
+    QSettings i18n(QDir::homePath() + "/.config/sysconfig/i18n", QSettings::NativeFormat);
+
+    setenv("LANG", i18n.value("LANG","en_US.UTF-8").toString().toAscii().data(), 1);
 
     // we never, ever want to be saddled with 'native' graphicssystem, as it is
     // amazingly slow. set us to 'raster'. this won't impact GL mode, as we are
