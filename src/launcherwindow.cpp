@@ -78,8 +78,7 @@ LauncherWindow::LauncherWindow(bool fullscreen, int width, int height, bool open
     m_inhibitScreenSaver(false),
     m_useOpenGl(opengl),
     m_usingGl(false),
-    locale(new meego::Locale(this)),
-    m_debugInfoEnabled(true)
+    locale(new meego::Locale(this))
 {
     LauncherApp *app = static_cast<LauncherApp *>(qApp);
 
@@ -129,6 +128,7 @@ LauncherWindow::LauncherWindow(bool fullscreen, int width, int height, bool open
     app->installTranslator(&commonTranslator); // Common Components translations
     app->installTranslator(&mediaTranslator);  // Common Media translations
 
+    setEnableDebugInfo(true);
     connect(&m_debugInfoFileWatcher, SIGNAL(fileChanged(QString)), SLOT(debugFileChanged(QString)));
     connect(&m_debugInfoFileWatcher, SIGNAL(directoryChanged(QString)), SLOT(debugDirChanged(QString)));
 
