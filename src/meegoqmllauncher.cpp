@@ -155,6 +155,7 @@ int MeeGoQMLLauncher::launch(int argc, char **argv)
     launcherApp->setApplicationName(app);
     launcherApp->dbusInit(argc, argv);
     launcherApp->setPreinit(false);
+    launcherApp->setOrientationSensorOn(true);
 
     launcherWindow->init(fullscreen, width, height, opengl);
     if (!noRaise)
