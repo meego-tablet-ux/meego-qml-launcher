@@ -59,7 +59,6 @@ LauncherApp::LauncherApp(int &argc, char **argv) :
     preinit(false)
 {
     connect(&orientationSensor, SIGNAL(readingChanged()), SLOT(onOrientationChanged()));
-    orientationSensor.start();
 
     QString theme = MGConfItem("/meego/ux/theme").value().toString();
     QString themeFile = QString("/usr/share/themes/") + theme + "/theme.ini";
