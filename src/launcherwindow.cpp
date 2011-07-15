@@ -78,7 +78,8 @@ LauncherWindow::LauncherWindow(bool fullscreen, int width, int height, bool open
     m_inhibitScreenSaver(false),
     m_useOpenGl(opengl),
     m_usingGl(false),
-    locale(new meego::Locale(this))
+    locale(new meego::Locale(this)),
+    m_pendingLoadScene(false)
 {
     LauncherApp *app = static_cast<LauncherApp *>(qApp);
 
@@ -119,7 +120,6 @@ LauncherWindow::LauncherWindow(bool fullscreen, int width, int height, bool open
     }
 
     loadCommonTranslators();
-    connect(app, SIGNAL(localeSettingsChanged()), this, SLOT(loadCommonTranslators()));
 
     // Qt will search each translator for a string translation, starting with
     // the last translator installed working back to the first translator.
@@ -138,6 +138,13 @@ LauncherWindow::LauncherWindow(bool fullscreen, int width, int height, bool open
     }
     else
     {
+        // When launching via booster, we always operate at fullscreen
+        setWindowFlags(Qt::FramelessWindowHint);
+        context->setContextProperty("screenWidth",
+                                    qApp->desktop()->rect().width());
+        context->setContextProperty("screenHeight",
+                                    qApp->desktop()->rect().height());
+
         setSource(QUrl::fromLocalFile("/usr/share/meego-qml-launcher/common-imports.qml"));
     }
 }
@@ -179,25 +186,23 @@ void LauncherWindow::init(bool fullscreen, int width, int height,
     context->setContextProperty("screenHeight", screenHeight);
 
     if (doSetSource) {
-        sharePath = QString("/usr/share/") + app->applicationName() + "/";
-        if (!QFile::exists(sharePath + "main.qml"))
+        sharePath = QString("/usr/share/") + app->applicationName() + "/main.qml";
+        if (!QFile::exists(sharePath))
         {
             qFatal("%s does not exist!", sharePath.toUtf8().data());
         }
+        m_pendingLoadScene = true;
     }
 
     loadAppTranslators();
-    connect(app, SIGNAL(localeSettingsChanged()), this, SLOT(loadAppTranslators()));
+    connect(locale, SIGNAL(localeChanged()), this, SLOT(loadAppTranslators()));
     app->installTranslator(&appTranslator);    // App specific translations
 
     connect(locale, SIGNAL(localeChanged()), this, SLOT(localeChanged()));
 
-    // Switch to GL rendering if it's available
-    switchToGLRendering();
-
-    if (doSetSource)
+    if (!app->enableRenderingSwap())
     {
-        setSource(QUrl(sharePath + "main.qml"));
+        switchToGLRendering();
     }
 
     setGeometry(QRect(0, 0, screenWidth, screenHeight));
@@ -302,6 +307,11 @@ bool LauncherWindow::event (QEvent * event)
     if (event->type() == QEvent::Show)
     {
         setActualOrientation(m_actualOrientation);
+        if (m_pendingLoadScene)
+        {
+            m_pendingLoadScene = false;
+            loadScene();
+        }
     }
     return QDeclarativeView::event(event);
 }
@@ -334,7 +344,7 @@ void LauncherWindow::switchToGLRendering()
         return;
 
     //go once around event loop to avoid crash in egl
-    QTimer::singleShot(0, this, SLOT(doSwitchToGLRendering()));
+    QTimer::singleShot(1, this, SLOT(doSwitchToGLRendering()));
 }
 
 void LauncherWindow::switchToSoftwareRendering()
@@ -440,5 +450,26 @@ void LauncherWindow::setEnableDebugInfo(bool enable)
         m_debugInfoFileWatcher.removePath(DEBUG_INFO_PATH);
         m_debugInfo.clear();
         emit debugInfoChanged();
+    }
+}
+
+void LauncherWindow::loadScene()
+{
+    LauncherApp *app = static_cast<LauncherApp *>(qApp);
+
+    // This will trigger the stem cell to load the target
+    // app source, and then delete the splash
+    emit appSourceChanged();
+
+    // We delay turning on sw rendering till the window has
+    // had a chance to render since its actually faster to do
+    // the initial rendering in sofware.  Here we set a fallback
+    // timer to handle the case where we are not being loaded by
+    // the booster, so there is no splash that will ask to switch
+    // back over
+    if (m_useOpenGl && app->enableRenderingSwap() &&
+            !source().toString().endsWith("common-imports.qml"))
+    {
+        switchToGLRendering();
     }
 }
