@@ -117,7 +117,7 @@ void LauncherApp::dbusInit(int argc, char** argv)
         args << argv[i];
     MeeGoAppProxy(service, object, bus).raise(args);
 
-    std::exit(0);
+    _exit(0);
 }
 
 void LauncherApp::raise(const QStringList& parameters)
