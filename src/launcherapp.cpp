@@ -56,10 +56,10 @@ LauncherApp::LauncherApp(int &argc, char **argv) :
     QApplication(argc, argv),
     orientation(1),
     foregroundWindow(0),
-    preinit(false)
+    preinit(false),
+    m_restoreRequested(false)
 {
     connect(&orientationSensor, SIGNAL(readingChanged()), SLOT(onOrientationChanged()));
-
     QString theme = MGConfItem("/meego/ux/theme").value().toString();
     QString themeFile = QString("/usr/share/themes/") + theme + "/theme.ini";
     if(!QFile::exists(themeFile))
@@ -256,7 +256,7 @@ bool LauncherApp::x11EventFilter(XEvent *event)
                 foregroundWindow = (int)w;
                 emit foregroundWindowChanged();
 
-                if (m_enableRenderingSwap)
+                if (enableRenderingSwap())
                 {
                     // Find out if we're in the foreground, and if so, switch to GL
                     // rendering. If we're not, switch to software rendering.
@@ -397,4 +397,20 @@ void LauncherApp::launchDesktopByName(QString name, QString cmd, QString cdata)
     {
         launcher.asyncCall(QLatin1String("launchDesktopByName"), name, cmd, cdata);
     }
+}
+
+QString LauncherApp::getSplashImage()
+{
+    // If the app is attempting to restore a saved state then we support loading
+    // a snapshot of the last running window as the splash screen
+    if (getRestoreRequested())
+    {
+        QString savedSplash = QDir::homePath() + "/.cache/" + applicationName() + "/splash.png";
+        if (QFile::exists(savedSplash))
+        {
+            return savedSplash;
+        }
+    }
+
+    return QString("image://systemicon/" + applicationName());
 }

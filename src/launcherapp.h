@@ -24,7 +24,8 @@ class LauncherApp : public QApplication
     Q_PROPERTY(bool orientationLocked READ getOrientationLocked WRITE setOrientationLocked);
     Q_PROPERTY(int foregroundWindow READ getForegroundWindow NOTIFY foregroundWindowChanged);
     Q_PROPERTY(bool preinit READ getPreinit NOTIFY preinitChanged);
-
+    Q_PROPERTY(QString splashImage READ getSplashImage NOTIFY splashImageChanged);
+    Q_PROPERTY(bool restoreRequested READ getRestoreRequested);
 public:
     explicit LauncherApp(int &argc, char **argv);
     void dbusInit(int argc, char** argv);
@@ -54,6 +55,22 @@ public:
 
     QSettings *themeConfig;
 
+    QString getSplashImage();
+    void updateSplash() {
+        emit splashImageChanged();
+    }
+
+    bool enableRenderingSwap() {
+        return m_enableRenderingSwap;
+    }
+
+    void setRestoreRequested(bool requested) {
+        m_restoreRequested = requested;
+    }
+    bool getRestoreRequested() {
+        return m_restoreRequested;
+    }
+
 public slots:
     void appPageLoaded();
     void raise(const QStringList& args);
@@ -68,6 +85,7 @@ signals:
     void foregroundWindowChanged();
     void dismissKeyboard();
     void preinitChanged();
+    void splashImageChanged();
 
 protected:
     virtual bool x11EventFilter(XEvent *event);
@@ -94,6 +112,7 @@ private:
     QOrientationSensor orientationSensor;
 
     bool m_enableRenderingSwap;
+    bool m_restoreRequested;
 };
 
 #endif // LAUNCHER_APP_H

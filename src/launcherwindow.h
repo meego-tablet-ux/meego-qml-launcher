@@ -27,6 +27,7 @@ class LauncherWindow : public QDeclarativeView
     Q_PROPERTY(bool inhibitScreenSaver READ inhibitScreenSaver WRITE setInhibitScreenSaver)
     Q_PROPERTY(QStringList call READ getCall NOTIFY callChanged)
     Q_PROPERTY(QString debugInfo READ getDebugInfo NOTIFY debugInfoChanged);
+    Q_PROPERTY(QString appSource READ getAppSource NOTIFY appSourceChanged);
 
 public:
     LauncherWindow(bool fullscreen, int width, int height, bool opengl, bool doSetSource = true, QWidget *parent = NULL);
@@ -38,9 +39,6 @@ public:
         return m_actualOrientation;
     }
     void setActualOrientation(int orientation);
-
-    void switchToGLRendering();
-    void switchToSoftwareRendering();
 
     bool inhibitScreenSaver() {
         return m_inhibitScreenSaver;
@@ -58,6 +56,10 @@ public:
             return QString();
     }
 
+    QString getAppSource() const {
+        return sharePath;
+    }
+
     // temporary method to enable existing clients
     // that still think the LauncherWindow has an
     // extra outer QWidget
@@ -72,6 +74,7 @@ signals:
     void callChanged();
     void debugInfoChanged();
     void retranslateUi();
+    void appSourceChanged();
 
 public slots:
     void triggerSystemUIMenu();
@@ -83,6 +86,8 @@ public slots:
         emit vkbHeight(newArea.x(), newArea.y(), newArea.width(), newArea.height());
     }
     void dismissKeyboard();
+    void switchToGLRendering();
+    void switchToSoftwareRendering();
 
 private slots:
     void loadCommonTranslators();
@@ -92,6 +97,7 @@ private slots:
     void doSwitchToGLRendering();
     void debugDirChanged(const QString);
     void debugFileChanged(const QString);
+    void loadScene();
 
 protected:
     bool event(QEvent * event);
@@ -118,6 +124,8 @@ private:
     bool m_debugInfoEnabled;
     QString m_debugInfo;
     QFileSystemWatcher m_debugInfoFileWatcher;
+
+    bool m_pendingLoadScene;
 
     friend class MeeGoQMLLauncher;
 };

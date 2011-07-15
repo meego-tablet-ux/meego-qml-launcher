@@ -152,7 +152,9 @@ int MeeGoQMLLauncher::launch(int argc, char **argv)
         }
     }
 
+    launcherApp->setRestoreRequested(cmd == "restore");
     launcherApp->setApplicationName(app);
+    launcherApp->updateSplash();
     launcherApp->dbusInit(argc, argv);
     launcherApp->setPreinit(false);
     launcherApp->setOrientationSensorOn(true);
