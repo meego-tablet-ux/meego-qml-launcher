@@ -11,6 +11,7 @@
 #include <QSettings>
 #include <QDir>
 #include <cstdlib>
+#include <sys/prctl.h>
 
 #include "launcherapp.h"
 #include "launcherwindow.h"
@@ -158,6 +159,10 @@ int MeeGoQMLLauncher::launch(int argc, char **argv)
     launcherApp->dbusInit(argc, argv);
     launcherApp->setPreinit(false);
     launcherApp->setOrientationSensorOn(true);
+
+    // Set process name so all QML apps do not look like the
+    // same app for profiling/development tools
+    prctl(PR_SET_NAME, app.mid(0, 16).toAscii().data(), 0, 0, 0);
 
     launcherWindow->init(fullscreen, width, height, opengl);
     if (!noRaise)
