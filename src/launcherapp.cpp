@@ -353,6 +353,7 @@ void LauncherApp::setOrientationSensorOn(bool value)
     if (value && !orientationSensor.isActive())
     {
         orientationSensor.start();
+        onOrientationChanged();
     }
     else if(!value && orientationSensor.isActive())
     {
