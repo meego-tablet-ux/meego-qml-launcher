@@ -111,7 +111,8 @@ private:
 
     QString sharePath;
     QTranslator qtTranslator;
-    QTranslator commonTranslator;
+    QTranslator componentsTranslator;
+    QTranslator labsTranslator;
     QTranslator mediaTranslator;
     QTranslator appTranslator;
     int m_actualOrientation;
