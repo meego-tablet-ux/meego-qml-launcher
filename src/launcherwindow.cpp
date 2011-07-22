@@ -186,7 +186,7 @@ void LauncherWindow::init(bool fullscreen, int width, int height,
     context->setContextProperty("screenHeight", screenHeight);
 
     if (doSetSource) {
-        sharePath = QString("/usr/share/") + app->applicationName() + "/main.qml";
+        sharePath = QString("/usr/share/") + app->getApplicationPath() + "/main.qml";
         if (!QFile::exists(sharePath))
         {
             qFatal("%s does not exist!", sharePath.toUtf8().data());
@@ -251,7 +251,7 @@ void LauncherWindow::loadAppTranslators()
 {
     LauncherApp *app = static_cast<LauncherApp *>(qApp);
 
-    appTranslator.load(app->applicationName() + "_" + locale->locale() + ".qm",
+    appTranslator.load(app->getApplicationPath() + "_" + locale->locale() + ".qm",
                        QLibraryInfo::location(QLibraryInfo::TranslationsPath));
 }
 

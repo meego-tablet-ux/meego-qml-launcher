@@ -71,6 +71,13 @@ public:
         return m_restoreRequested;
     }
 
+    void setApplicationPath(const QString &path) {
+      m_applicationPath = path;
+    }
+    QString getApplicationPath() {
+      return m_applicationPath;
+    }
+
 public slots:
     void appPageLoaded();
     void raise(const QStringList& args);
@@ -113,6 +120,9 @@ private:
 
     bool m_enableRenderingSwap;
     bool m_restoreRequested;
+
+    // application path indicates where to find app qml files 
+    QString m_applicationPath;
 };
 
 #endif // LAUNCHER_APP_H
