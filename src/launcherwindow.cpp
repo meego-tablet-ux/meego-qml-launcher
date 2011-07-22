@@ -125,7 +125,8 @@ LauncherWindow::LauncherWindow(bool fullscreen, int width, int height, bool open
     // the last translator installed working back to the first translator.
     // The first translation found wins.
     app->installTranslator(&qtTranslator);     // General Qt translations
-    app->installTranslator(&commonTranslator); // Common Components translations
+    app->installTranslator(&componentsTranslator); // Common Components translations
+    app->installTranslator(&labsTranslator); // MeeGo Labs Components translations
     app->installTranslator(&mediaTranslator);  // Common Media translations
 
     setEnableDebugInfo(true);
@@ -241,8 +242,10 @@ void LauncherWindow::loadCommonTranslators()
 {
     qtTranslator.load("qt_" + locale->locale() + ".qm",
                       QLibraryInfo::location(QLibraryInfo::TranslationsPath));
-    commonTranslator.load("meegolabs-ux-components_" + locale->locale() + ".qm",
-                          QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+    labsTranslator.load("meegolabs-ux-components_" + locale->locale() + ".qm",
+                        QLibraryInfo::location(QLibraryInfo::TranslationsPath));
+    componentsTranslator.load("meego-ux-components_" + locale->locale() + ".qm",
+                              QLibraryInfo::location(QLibraryInfo::TranslationsPath));
     mediaTranslator.load("meego-ux-media-qml_" + locale->locale() + ".qm",
                          QLibraryInfo::location(QLibraryInfo::TranslationsPath));
 }
