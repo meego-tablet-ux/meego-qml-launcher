@@ -105,6 +105,7 @@ int MeeGoQMLLauncher::launch(int argc, char **argv)
     QString cmd;
     QString cdata;
     QString app;
+    QString appName;
 
     if (!fakeArgv) {
         // Common initializations have not been made yet.
@@ -137,7 +138,13 @@ int MeeGoQMLLauncher::launch(int argc, char **argv)
         }
         else if (s == "--app")
         {
+            // app is to specify application path, and used as application name
+            // when "--appname" is not set
             app = QString(argv[++i]);
+        }
+        else if (s == "--appname")
+        {
+            appName = QString(argv[++i]);
         }
         else if (s == "--noraise")
         {
@@ -154,15 +161,30 @@ int MeeGoQMLLauncher::launch(int argc, char **argv)
     }
 
     launcherApp->setRestoreRequested(cmd == "restore");
-    launcherApp->setApplicationName(app);
+    // '--appname' is used to allow one binary running as different applications
+    // if it is not set, fall back to use application path '--app'
+    launcherApp->setApplicationPath(app);
+    if (appName.isEmpty()) 
+    {
+      launcherApp->setApplicationName(app);
+    
+      // Set process name so all QML apps do not look like the
+      // same app for profiling/development tools
+      prctl(PR_SET_NAME, app.mid(0, 16).toAscii().data(), 0, 0, 0);
+    } 
+    else 
+    {
+      launcherApp->setApplicationName(appName);
+
+      // Set process name so all QML apps do not look like the
+      // same app for profiling/development tools
+      prctl(PR_SET_NAME, appName.mid(0, 16).toAscii().data(), 0, 0, 0);
+    }
+
     launcherApp->updateSplash();
     launcherApp->dbusInit(argc, argv);
     launcherApp->setPreinit(false);
     launcherApp->setOrientationSensorOn(true);
-
-    // Set process name so all QML apps do not look like the
-    // same app for profiling/development tools
-    prctl(PR_SET_NAME, app.mid(0, 16).toAscii().data(), 0, 0, 0);
 
     launcherWindow->init(fullscreen, width, height, opengl);
     if (!noRaise)
