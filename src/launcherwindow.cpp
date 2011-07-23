@@ -48,6 +48,8 @@
 
 #define DEBUG_INFO_PATH "/var/tmp/debug.info"
 
+Q_DECLARE_METATYPE(QGraphicsObject *);
+
 class NetworkAccessManagerFactory : public QDeclarativeNetworkAccessManagerFactory
 {
 public:
@@ -218,14 +220,18 @@ void LauncherWindow::keyPressEvent ( QKeyEvent * event )
         QGraphicsObject* window = rootObject();
         if (window)
         {
-            QVariant orientation = window->property("orientation");
-            if(orientation.isValid())
+            QGraphicsObject *appItem = window->property("appItem").value<QGraphicsObject *>();
+            if (appItem)
             {
-                int orient = orientation.toInt();
-                orient = ((orient + 1) % 4);
-                orientation.setValue(orient);
-                window->setProperty("orientation", orientation);
-                return;
+                QVariant orientation = appItem->property("orientation");
+                if(orientation.isValid())
+                {
+                    int orient = orientation.toInt();
+                    orient = ((orient + 1) % 4);
+                    orientation.setValue(orient);
+                    appItem->setProperty("orientation", orientation);
+                    return;
+                }
             }
         }
     }

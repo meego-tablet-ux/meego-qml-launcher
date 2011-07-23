@@ -7,6 +7,8 @@ Item {
     width: screenWidth
     height: screenHeight
 
+    property alias appItem: appLauncherAppLoader.item
+
     Loader {
         id: appLauncherAppLoader
 
