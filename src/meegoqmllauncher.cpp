@@ -184,12 +184,12 @@ int MeeGoQMLLauncher::launch(int argc, char **argv)
     launcherApp->updateSplash();
     launcherApp->dbusInit(argc, argv);
     launcherApp->setPreinit(false);
-    launcherApp->setOrientationSensorOn(true);
 
     launcherWindow->init(fullscreen, width, height, opengl);
     if (!noRaise)
     {
         qDebug("Raising window");
+        launcherApp->setOrientationSensorOn(true);
         launcherWindow->show();
     }
     else
