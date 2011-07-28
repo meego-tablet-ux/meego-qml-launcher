@@ -80,8 +80,7 @@ LauncherWindow::LauncherWindow(bool fullscreen, int width, int height, bool open
     m_inhibitScreenSaver(false),
     m_useOpenGl(opengl),
     m_usingGl(false),
-    locale(new meego::Locale(this)),
-    m_pendingLoadScene(false)
+    locale(new meego::Locale(this))
 {
     LauncherApp *app = static_cast<LauncherApp *>(qApp);
 
@@ -150,6 +149,18 @@ LauncherWindow::LauncherWindow(bool fullscreen, int width, int height, bool open
 
         setSource(QUrl::fromLocalFile("/usr/share/meego-qml-launcher/common-imports.qml"));
     }
+
+    MGConfItem appSourceDelayItem("/meego/ux/AppSourceDelay");
+    if (appSourceDelayItem.value().isValid())
+    {
+        m_appSourceDelay = appSourceDelayItem.value().toInt();
+    }
+    else
+    {
+        // Sane default delay to postpone loading application content
+        // until the window has finished animating into the scene
+        m_appSourceDelay = 200;
+    }
 }
 
 LauncherWindow::~LauncherWindow()
@@ -194,7 +205,6 @@ void LauncherWindow::init(bool fullscreen, int width, int height,
         {
             qFatal("%s does not exist!", sharePath.toUtf8().data());
         }
-        m_pendingLoadScene = true;
     }
 
     loadAppTranslators();
@@ -316,10 +326,16 @@ bool LauncherWindow::event (QEvent * event)
     if (event->type() == QEvent::Show)
     {
         setActualOrientation(m_actualOrientation);
-        if (m_pendingLoadScene)
+
+        // When an app is launched without the --noraise argument,
+        // then we delay loading the application content till after
+        // the we window has been mapped to ensure a quick show of
+        // the initial splash screen.
+        if (m_appSource.isEmpty())
         {
-            m_pendingLoadScene = false;
-            loadScene();
+            // Even though we just got mapped, allow the compositor time
+            // to animate the window into the sceen before loading content
+            QTimer::singleShot(m_appSourceDelay, this, SLOT(loadApplicationContent()));
         }
     }
     return QDeclarativeView::event(event);
@@ -459,26 +475,5 @@ void LauncherWindow::setEnableDebugInfo(bool enable)
         m_debugInfoFileWatcher.removePath(DEBUG_INFO_PATH);
         m_debugInfo.clear();
         emit debugInfoChanged();
-    }
-}
-
-void LauncherWindow::loadScene()
-{
-    LauncherApp *app = static_cast<LauncherApp *>(qApp);
-
-    // This will trigger the stem cell to load the target
-    // app source, and then delete the splash
-    emit appSourceChanged();
-
-    // We delay turning on sw rendering till the window has
-    // had a chance to render since its actually faster to do
-    // the initial rendering in sofware.  Here we set a fallback
-    // timer to handle the case where we are not being loaded by
-    // the booster, so there is no splash that will ask to switch
-    // back over
-    if (m_useOpenGl && app->enableRenderingSwap() &&
-            !source().toString().endsWith("common-imports.qml"))
-    {
-        switchToGLRendering();
     }
 }

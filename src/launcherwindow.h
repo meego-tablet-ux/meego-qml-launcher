@@ -57,7 +57,7 @@ public:
     }
 
     QString getAppSource() const {
-        return sharePath;
+        return m_appSource;
     }
 
     // temporary method to enable existing clients
@@ -89,6 +89,11 @@ public slots:
     void switchToGLRendering();
     void switchToSoftwareRendering();
 
+    void loadApplicationContent() {
+        m_appSource = sharePath;
+        emit appSourceChanged();
+    }
+
 private slots:
     void loadCommonTranslators();
     void loadAppTranslators();
@@ -97,7 +102,6 @@ private slots:
     void doSwitchToGLRendering();
     void debugDirChanged(const QString);
     void debugFileChanged(const QString);
-    void loadScene();
 
 protected:
     bool event(QEvent * event);
@@ -126,7 +130,8 @@ private:
     QString m_debugInfo;
     QFileSystemWatcher m_debugInfoFileWatcher;
 
-    bool m_pendingLoadScene;
+    int m_appSourceDelay;
+    QString m_appSource;
 
     friend class MeeGoQMLLauncher;
 };

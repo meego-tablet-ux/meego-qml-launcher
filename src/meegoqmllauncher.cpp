@@ -188,13 +188,18 @@ int MeeGoQMLLauncher::launch(int argc, char **argv)
     launcherWindow->init(fullscreen, width, height, opengl);
     if (!noRaise)
     {
-        qDebug("Raising window");
         launcherApp->setOrientationSensorOn(true);
         launcherWindow->show();
     }
     else
     {
-        qDebug("Not raising window");
+        // The idea behind starting an app with --noraise is that
+        // the application content is loaded and executing even though
+        // the acutal toplevel window is not displayed yet.  Since
+        // we normally delay loading the app content till after the
+        // initial window showing the splash has been mapped, then we
+        // need to explicitly trigger loading the app content in this case
+        launcherWindow->loadApplicationContent();
     }
 
     if (!cmd.isEmpty() || !cdata.isEmpty())

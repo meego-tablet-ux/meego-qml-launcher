@@ -11,6 +11,7 @@ Item {
 
     Loader {
         id: appLauncherAppLoader
+        source: mainWindow.appSource
 
         // The mainWindow's appSource will be an empty string
         // until the invoker gets a command to turn into a specific
@@ -44,15 +45,6 @@ Item {
             width: screenWidth
             height: screenHeight
             color: "black"
-            Connections {
-                target: qApp
-                onForegroundWindowChanged: {
-                    if (qApp.foregroundWindow == mainWindow.winId)
-                    {
-                        appLauncherAppLoader.source = mainWindow.appSource;
-                    }
-                }
-            }
             Image {
                 anchors.centerIn: parent
                 source: qApp.splashImage
